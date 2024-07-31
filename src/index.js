@@ -1,6 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const { clearSessionMap } = require("./utils/session");
+const NodeCache = require("node-cache");
 
 require("dotenv").config();
 require("./db/init");
@@ -19,9 +19,12 @@ app.use(require("./utils/cors"));
 app.use("/api/c/user", require("./controller/userController"));
 app.use("/api/c/captcha", require("./controller/captcha"));
 
-clearSessionMap(~~process.env.CAPTCHA_SESSION_CLEAR_TIME || 10000)
-
 const port = process.env.SERVER_PORT || 3000;
 app.listen(port, () => {
     console.log("Server is listenning in http://localhost:" + port);
 });
+
+/**
+ * 存储session
+ */
+exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE, checkperiod: process.env.CAPTCHA_SESSION_CLEAR_TIME })

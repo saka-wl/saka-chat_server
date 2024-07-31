@@ -1,12 +1,10 @@
 
 const { v4: uuidv4 } = require('uuid');
-
-let globalSessionInfo = new Map()
+const mainMessage = require("../index")
 
 exports.getJSessionIdInCode = (code) => {
     const jsessionId = uuidv4()
-    globalSessionInfo.set(jsessionId, { code, date: Date.now() })
-    console.log(globalSessionInfo)
+    mainMessage.globalSessionInfo.set(jsessionId, { code })
     return jsessionId
 }
 
@@ -17,26 +15,9 @@ exports.getJSessionIdInCode = (code) => {
  * @returns 
  */
 exports.verify = (jsessionId, code) => {
-    console.log(globalSessionInfo)
-    if(!jsessionId || !globalSessionInfo.has(jsessionId)) return false;
-    const captcha = globalSessionInfo.get(jsessionId)
-    globalSessionInfo.delete(jsessionId)
-    console.log(captcha)
+    if(!jsessionId || !mainMessage.globalSessionInfo.has(jsessionId)) return false;
+    const captcha = mainMessage.globalSessionInfo.get(jsessionId)
+    mainMessage.globalSessionInfo.del(jsessionId)
     if(captcha.code?.toLowerCase() !== code?.toLowerCase()) return false;
-    if(~~captcha.date + ~~process.env.CAPTCHA_TIMELINE < Date.now()) return false;
     return true;
-}
-
-/**
- * 定时清除内存
- */
-exports.clearSessionMap = (time) => {
-    setInterval(() => {
-        let keys = globalSessionInfo.keys()
-        for(let key of keys) {
-            if(~~globalSessionInfo[key]?.date + ~~process.env.CAPTCHA_TIMELINE < Date.now()) {
-                globalSessionInfo.delete(key)
-            }
-        }
-    }, time)
 }

@@ -5,7 +5,6 @@ const router = express.Router()
 
 router.post('/login', (req, res, next) => {
     // 1. 验证图形验证码
-    console.log(req?.cookies[process.env.CAPTCHA_SESSION_NAME])
     const isCaptchaCorrect = verify(req?.cookies[process.env.CAPTCHA_SESSION_NAME], req.body.code)
     if(!isCaptchaCorrect) {
         res.send(returnFormat(400, undefined, "验证码错误！"))
