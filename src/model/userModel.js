@@ -10,7 +10,7 @@ module.exports = sequelize.define("User", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    loginPwd: {
+    password: {
         type: DataTypes.STRING,
         allowNull: false
     },

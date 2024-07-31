@@ -6,6 +6,7 @@ let globalSessionInfo = new Map()
 exports.getJSessionIdInCode = (code) => {
     const jsessionId = uuidv4()
     globalSessionInfo.set(jsessionId, { code, date: Date.now() })
+    console.log(globalSessionInfo)
     return jsessionId
 }
 
@@ -16,9 +17,11 @@ exports.getJSessionIdInCode = (code) => {
  * @returns 
  */
 exports.verify = (jsessionId, code) => {
+    console.log(globalSessionInfo)
     if(!jsessionId || !globalSessionInfo.has(jsessionId)) return false;
     const captcha = globalSessionInfo.get(jsessionId)
     globalSessionInfo.delete(jsessionId)
+    console.log(captcha)
     if(captcha.code?.toLowerCase() !== code?.toLowerCase()) return false;
     if(~~captcha.date + ~~process.env.CAPTCHA_TIMELINE < Date.now()) return false;
     return true;
@@ -27,7 +30,7 @@ exports.verify = (jsessionId, code) => {
 /**
  * 定时清除内存
  */
-exports.clearMap = () => {
+exports.clearSessionMap = (time) => {
     setInterval(() => {
         let keys = globalSessionInfo.keys()
         for(let key of keys) {
@@ -35,5 +38,5 @@ exports.clearMap = () => {
                 globalSessionInfo.delete(key)
             }
         }
-    }, 10000)
+    }, time)
 }

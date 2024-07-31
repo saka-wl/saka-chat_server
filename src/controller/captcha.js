@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const svgCaptcha = require('svg-captcha')
 const { getJSessionIdInCode } = require('../utils/session')
+const { setCookie } = require('../utils/cookie')
 
 /**
  * 获取二维码图片
@@ -21,6 +22,8 @@ router.get('/getCaptcha', async (req, res, next) => {
     const captcha = await getCaptcha()
     const jsessionId = getJSessionIdInCode(captcha.text)
     res.setHeader("Content-Type", "image/svg+xml")
-    res.setHeader(process.env.CAPTCHA_SESSION_NAME, jsessionId)
+    res.setHeader('Set-Cookie', setCookie(process.env.CAPTCHA_SESSION_NAME, jsessionId));
     res.send(captcha.data)
 })
+
+module.exports = router
