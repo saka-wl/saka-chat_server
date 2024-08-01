@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const NodeCache = require("node-cache");
+const { returnFormat } = require("./utils/format");
 
 require("dotenv").config();
 require("./db/init");
@@ -18,6 +19,22 @@ app.use(require("./utils/cors"));
  */
 app.use("/api/c/user", require("./controller/userController"));
 app.use("/api/c/captcha", require("./controller/captcha"));
+
+/**
+ * 工具api
+ */
+app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
+
+/**
+ * 错误捕获中间件
+ */
+app.use(function (err, req, res, next) {
+    if (err instanceof ServiceError) {
+        res.send(returnFormat(500, undefined, err.toResponseJSON()));
+    } else {
+        res.send(returnFormat(500, undefined, new UnknownError().toResponseJSON()));
+    }
+});
 
 const port = process.env.SERVER_PORT || 3000;
 app.listen(port, () => {

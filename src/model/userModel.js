@@ -2,9 +2,13 @@ const { DataTypes } = require('sequelize')
 const sequelize = require('../db/db')
 
 module.exports = sequelize.define("User", {
-    loginId: {
+    phone: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     account: {
         type: DataTypes.STRING,
@@ -17,6 +21,10 @@ module.exports = sequelize.define("User", {
     nickname: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    avatar: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
 }, {
     freezeTableName: true,

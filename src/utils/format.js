@@ -1,8 +1,9 @@
 
-exports.returnFormat = (code, data = "", msg = "") => {
+exports.returnFormat = (code, data = "", msg = "", authorization) => {
     return {
         code,
         data,
-        msg
+        msg,
+        authorization
     }
 }
