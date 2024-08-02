@@ -2,16 +2,22 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const NodeCache = require("node-cache");
 const { returnFormat } = require("./utils/format");
+const path = require("path");
 
 require("dotenv").config();
 require("./db/init");
 
 const app = express();
-app.use(cookieParser());
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(require("./utils/cors"));
+
+/**
+ * 挂载静态资源
+ */
+app.use('/static/images', express.static(path.resolve(__dirname, "./files/normalFiles/Images")))
 
 /**
  * /c 无鉴权c端接口
@@ -29,11 +35,7 @@ app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
  * 错误捕获中间件
  */
 app.use(function (err, req, res, next) {
-    if (err instanceof ServiceError) {
-        res.send(returnFormat(500, undefined, err.toResponseJSON()));
-    } else {
-        res.send(returnFormat(500, undefined, new UnknownError().toResponseJSON()));
-    }
+    res.send(returnFormat(500, null, err?.message || "服务器错误！"));
 });
 
 const port = process.env.SERVER_PORT || 3000;

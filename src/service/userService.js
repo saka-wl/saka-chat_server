@@ -55,7 +55,8 @@ exports.enroll = async (account, password, nickname, phone, email, avatar) => {
             password: md5Password,
             nickname,
             phone,
-            email
+            email,
+            avatar
         })
         let token = encipherJWT({
             id: resp.dataValues.id,

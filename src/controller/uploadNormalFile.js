@@ -3,6 +3,7 @@ const multer = require("multer");
 const router = express.Router();
 const path = require("path");
 const { returnFormat } = require("../utils/format");
+const { v4: uuidv4 } = require('uuid');
 
 const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
     return multer({
@@ -12,7 +13,7 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
                 cb(null, filePath);
             },
             filename: function (req, file, cb) {
-                const uniqueName = Date.now() + "-" + req.query?.id;
+                const uniqueName = uuidv4();
                 const extName = path.extname(file.originalname);
                 cb(null, uniqueName + extName);
             },
@@ -38,10 +39,10 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
 }
 
 const imageExt = [".jpg",".tiff",".gif",".svg",".jfif",".webp",".png",".bmp"]
-const normalFilePath = path.resolve(__dirname, "../files/normalFiles")
+const normalImageFilePath = path.resolve(__dirname, "../files/normalFiles/Images")
 
-router.post("/single/image", upload(normalFilePath, 1024 * 1024 * 2, imageExt).single("image"), (req, res) => {
-    res.send(returnFormat(200, req.image.filename, "上传成功！"));
+router.post("/single/image", upload(normalImageFilePath, ~~process.env.NORMAL_FILE_LINIT_SIZE, imageExt).single("file"), (req, res) => {
+    res.send(returnFormat(200, req.file.filename, "上传成功！"));
 });
 
 module.exports = router;
