@@ -22,9 +22,19 @@ exports.objFormat = (obj, type = 0, ...args) => {
         if (type === 0 && args.includes(key)) {
             res[key] = obj[key]
         }
-        if(type === 1 && !args.includes(key)) {
+        if (type === 1 && !args.includes(key)) {
             res[key] = obj[key]
         }
     }
     return res
+}
+
+exports.isObjAllow = (obj, ...args) => {
+    if (!obj) return false;
+    for (let key in obj) {
+        if ((obj[key] === '' || obj[key] === null || obj[key] === undefined) && args.includes(key)) {
+            return false;
+        }
+    }
+    return true;
 }

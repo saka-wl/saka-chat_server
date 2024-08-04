@@ -1,25 +1,17 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../db/db')
 
-module.exports = sequelize.define("ChatRoom", {
-    friendId: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+module.exports = sequelize.define("UserFriend", {
     userId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    totalMessageIndex: {
-        type: DataTypes.BIGINT,
+    friendId: {
+        type: DataTypes.STRING,
         allowNull: false
     },
-    newMessageIndex: {
-        type: DataTypes.BIGINT,
-        allowNull: false
-    },
-    deleteMessageIndex: {
-        type: DataTypes.BIGINT,
+    chatRoomId: {
+        type: DataTypes.STRING,
         allowNull: false
     }
 }, {
