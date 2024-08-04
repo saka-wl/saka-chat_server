@@ -1,31 +1,29 @@
+
 const { DataTypes } = require('sequelize')
 const sequelize = require('../db/db')
 
-module.exports = sequelize.define("User", {
-    phone: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    account: {
+module.exports = sequelize.define("ChatMessage", {
+    chatRoomId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    password: {
+    fromUserId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    nickname: {
+    toUserId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    avatar: {
+    messageInfo: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: false
     },
+    // string | file | pic
+    messageType: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
 }, {
     freezeTableName: true,
     createdAt: true,

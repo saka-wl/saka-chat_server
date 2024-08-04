@@ -1,5 +1,10 @@
 const sequelize = require("./db")
-const userModel = require("../model/userModel")
+require("../model/userModel")
+require("../model/friendshipModel")
+require("../model/friendRequestModel")
+require("../model/chatRoomModel")
+require("../model/chatRoomGroupModel")
+require("../model/chatMessageModel")
 
 async function init() {
     await sequelize.sync({

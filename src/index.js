@@ -14,6 +14,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(require("./utils/cors"));
 
+// 鉴权判定
+app.use(require('./utils/tokenMiddleWare'))
+
 /**
  * 挂载静态资源
  */
@@ -21,10 +24,12 @@ app.use('/static/images', express.static(path.resolve(__dirname, "./files/normal
 
 /**
  * /c 无鉴权c端接口
- * /superc 有鉴权c端接口
+ * /.../super/... 有鉴权c端接口
  */
 app.use("/api/c/user", require("./controller/userController"));
 app.use("/api/c/captcha", require("./controller/captcha"));
+app.use("/api/c/friend", require("./controller/friendController"))
+
 
 /**
  * 工具api

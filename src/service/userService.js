@@ -68,3 +68,19 @@ exports.enroll = async (account, password, nickname, phone, email, avatar) => {
         return returnFormat(500, undefined, "服务器错误！")
     }
 }
+
+exports.searchUser = async ({
+    account,
+    nickname,
+    id
+}) => {
+    let obj = {}
+    if(account) obj.account = account;
+    if(nickname) obj.nickname = nickname;
+    if(id) obj.id = id;
+    const resp = await UserModel.findAndCountAll({
+        where: obj
+    });
+
+    return returnFormat(200, resp, '');
+}
