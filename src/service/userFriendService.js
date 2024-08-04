@@ -42,6 +42,5 @@ exports.getAllMyFriend = async (userId) => {
             friendEmail: friendInfo?.email
         }
     })
-    console.log(resp)
     return resp
 }
