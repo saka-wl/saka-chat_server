@@ -2,7 +2,6 @@ const express = require('express')
 const { verify } = require('../utils/session')
 const { returnFormat } = require('../utils/format')
 const { enroll, login, autoLogin, searchUser } = require('../service/userService')
-const { verifyJWT } = require('../utils/jwt')
 const router = express.Router()
 
 router.post('/login', async (req, res, next) => {
