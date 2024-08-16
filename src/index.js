@@ -3,13 +3,13 @@ const cookieParser = require("cookie-parser");
 const NodeCache = require("node-cache");
 const { returnFormat } = require("./utils/format");
 const path = require("path");
-const expressWs = require("express-ws");
+// const expressWs = require("express-ws");
 
 require("dotenv").config();
 require("./db/init");
 
 const app = express();
-expressWs(app);
+// expressWs(app);
 
 app.use(cookieParser());
 app.use(express.json());
