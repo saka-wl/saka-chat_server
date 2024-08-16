@@ -3,11 +3,13 @@ const cookieParser = require("cookie-parser");
 const NodeCache = require("node-cache");
 const { returnFormat } = require("./utils/format");
 const path = require("path");
+const expressWs = require("express-ws");
 
 require("dotenv").config();
 require("./db/init");
 
 const app = express();
+expressWs(app);
 
 app.use(cookieParser());
 app.use(express.json());
@@ -35,6 +37,11 @@ app.use("/api/c/friend", require("./controller/friendController"))
  * 工具api
  */
 app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
+
+/**
+ * websocket
+ */
+// app.ws('/ws/friendchat')
 
 /**
  * 错误捕获中间件
