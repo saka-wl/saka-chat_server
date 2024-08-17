@@ -3,13 +3,11 @@ const cookieParser = require("cookie-parser");
 const NodeCache = require("node-cache");
 const { returnFormat } = require("./utils/format");
 const path = require("path");
-// const expressWs = require("express-ws");
 
 require("dotenv").config();
 require("./db/init");
 
 const app = express();
-// expressWs(app);
 
 app.use(cookieParser());
 app.use(express.json());
@@ -39,11 +37,6 @@ app.use("/api/c/friend", require("./controller/friendController"))
 app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
 
 /**
- * websocket
- */
-// app.ws('/ws/friendchat')
-
-/**
  * 错误捕获中间件
  */
 app.use(function (err, req, res, next) {
@@ -51,7 +44,7 @@ app.use(function (err, req, res, next) {
 });
 
 const port = process.env.SERVER_PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log("Server is listenning in http://localhost:" + port);
 });
 
@@ -59,3 +52,6 @@ app.listen(port, () => {
  * 存储session
  */
 exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE, checkperiod: process.env.CAPTCHA_SESSION_CLEAR_TIME })
+
+// const socket = require('./socket')
+// socket(server)

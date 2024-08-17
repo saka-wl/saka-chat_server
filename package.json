@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/index.js"
+    "start": "nodemon ./src/index.js",
+    "socket": "nodemon ./src/socket.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "nodemon": "^3.1.4",
     "path-to-regexp": "^7.1.0",
     "sequelize": "^6.37.3",
+    "socket.io": "^4.7.5",
     "svg-captcha": "^1.4.0",
     "uuid": "^10.0.0"
   }
