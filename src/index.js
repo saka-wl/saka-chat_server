@@ -53,5 +53,5 @@ const server = app.listen(port, () => {
  */
 exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE, checkperiod: process.env.CAPTCHA_SESSION_CLEAR_TIME })
 
-// const socket = require('./socket')
-// socket(server)
+const socket = require('./socket/index')
+socket(server)
