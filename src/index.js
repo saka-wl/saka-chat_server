@@ -29,6 +29,7 @@ app.use('/static/images', express.static(path.resolve(__dirname, "./files/normal
 app.use("/api/c/user", require("./controller/userController"));
 app.use("/api/c/captcha", require("./controller/captcha"));
 app.use("/api/c/friend", require("./controller/friendController"))
+app.use("/api/c/friendchat", require("./controller/friendChatController"))
 
 
 /**
@@ -53,5 +54,8 @@ const server = app.listen(port, () => {
  */
 exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE, checkperiod: process.env.CAPTCHA_SESSION_CLEAR_TIME })
 
+/**
+ * socket 挂载实时聊天
+ */
 const socket = require('./socket/index')
 socket(server)

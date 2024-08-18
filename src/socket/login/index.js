@@ -7,13 +7,14 @@ const { verifyJWT } = require("../../utils/jwt")
  * @param {*} data 
  * @returns 
  */
-module.exports = (socket, refInfo, data) => {
+module.exports = (socket, usersMap, data) => {
     const res = verifyJWT(data.token)
     const userId = data.userId
     if (res === false || userId != res.id) {
         return;
     }
-    refInfo.usersMap.set(userId, {
+
+    usersMap.set(userId, {
         sendMessage: (msg) => {
             socket.emit("getMsgFromFriend", msg)
         }

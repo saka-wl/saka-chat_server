@@ -1,5 +1,6 @@
 
 const { saveMessage } = require("../../service/friendChatService");
+const { objFormat } = require("../../utils/format");
 const { verifyJWT } = require("../../utils/jwt")
 
 /**
@@ -7,21 +8,19 @@ const { verifyJWT } = require("../../utils/jwt")
  * @param {*} data 
  * @returns 
  */
-exports.sendMsgToFriend = (refInfo, data) => {
+exports.sendMsgToFriend = async (usersMap, data) => {
     const userId = data.userId
     const friendId = data.friendId
-    const message = data.message
     const res = verifyJWT(data.token)
     if(res === false || userId != res.id || !friendId) {
         return;
     }
-    const friendSocket = refInfo.usersMap.get(friendId)
+    const friendSocket = usersMap.get(~~friendId)
     // 1. 更新数据库消息，不需要异步await等待
-    saveMessage(data)
+    const resp = await saveMessage(data)
     // 2. 如果用户在线，在线发送消息
-    console.log(refInfo.usersMap)
     if(!friendSocket || typeof friendSocket?.sendMessage !== 'function') {
         return;
     }
-    friendSocket.sendMessage(message);
+    friendSocket.sendMessage(objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
 }
