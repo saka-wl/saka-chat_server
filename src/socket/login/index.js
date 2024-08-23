@@ -15,8 +15,8 @@ module.exports = (socket, usersMap, data) => {
     }
 
     usersMap.set(userId, {
-        sendMessage: (msg) => {
-            socket.emit("getMsgFromFriend", msg)
+        sendMessage: (name, msg) => {
+            socket.emit(name, msg)
         }
     })
 }

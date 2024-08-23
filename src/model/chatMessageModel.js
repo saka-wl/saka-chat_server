@@ -24,7 +24,7 @@ module.exports = sequelize.define("ChatMessage", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    // 1 正常显示； 0 过时消息； -1 已删除消息；-2 撤回消息
+    // 2 需显示消息； 1 正常消息； 0 过时消息； -1 已删除消息； -2 撤回消息
     status: {
         type: DataTypes.STRING,
         allowNull: true,
