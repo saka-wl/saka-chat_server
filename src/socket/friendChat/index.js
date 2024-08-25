@@ -8,7 +8,8 @@ const { verifyJWT } = require("../../utils/jwt")
  * @param {*} data 
  * @returns 
  */
-exports.sendMsgToFriend = async (usersMap, data) => {
+exports.sendMsgToFriend = async (socket, usersMap, data) => {
+    console.log(data)
     const userId = data.userId
     const friendId = data.friendId
     data.status = 2;
@@ -16,14 +17,19 @@ exports.sendMsgToFriend = async (usersMap, data) => {
     if(res === false || userId != res.id || !friendId) {
         return;
     }
-    const friendSocket = usersMap.get(~~friendId)
-    const userSocket = usersMap.get(~~userId)
+    const friendSocketId = usersMap.get(~~friendId) || usersMap.get(friendId.toString())
+    const userSocketId = usersMap.get(~~userId) || usersMap.get(userId.toString())
     // 1. 更新数据库消息，不需要异步await等待
     const resp = await saveMessage(data)
-    userSocket.sendMessage('getMsgFromMine', objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'))
+    if(userSocketId) {
+        // console.log(friendId, userSocket);
+        // userSocket.sendMessage('getMsgFromMine', objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
+        socket.emit('getMsgFromMine', objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
+    }
     // 2. 如果用户在线，在线发送消息
-    if(!friendSocket || typeof friendSocket?.sendMessage !== 'function') {
+    if(!friendSocketId) {
         return;
     }
-    friendSocket.sendMessage("getMsgFromFriend", objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
+    // friendSocket.sendMessage("getMsgFromFriend", objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
+    socket.to(friendSocketId).emit('getMsgFromFriend', objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
 }

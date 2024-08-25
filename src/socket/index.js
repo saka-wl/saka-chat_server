@@ -2,8 +2,9 @@
 const { Server } = require("socket.io");
 const loginServer = require("./login/index")
 const { sendMsgToFriend } = require("./friendChat/index");
+const NodeCache = require("node-cache");
 
-const usersMap = new Map()
+const usersMap = new NodeCache({ })
 
 module.exports = function (server) {
     const io = new Server(server, {
@@ -17,7 +18,7 @@ module.exports = function (server) {
          * 再将信息存储到数据库
          * 如果用户在线，在线发送消息
          */
-        socket.on("sendMsgToFriend", (data) => sendMsgToFriend(usersMap, data));
+        socket.on("sendMsgToFriend", (data) => sendMsgToFriend(socket, usersMap, data));
     
         /**
          * 聊天后端登录验证

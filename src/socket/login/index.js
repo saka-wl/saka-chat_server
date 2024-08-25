@@ -14,9 +14,14 @@ module.exports = (socket, usersMap, data) => {
         return;
     }
 
-    usersMap.set(userId, {
-        sendMessage: (name, msg) => {
-            socket.emit(name, msg)
-        }
-    })
+    if(usersMap.has(~~userId)) {
+        usersMap.del(~~userId)
+    }
+    console.log(userId + ' ' + Date.now())
+    // usersMap.set(~~userId, {
+    //     sendMessage: (name, msg) => {
+    //         socket.emit(name, msg)
+    //     }
+    // })
+    usersMap.set(~~userId, socket.id);
 }
