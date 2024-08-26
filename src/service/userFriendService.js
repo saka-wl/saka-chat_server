@@ -39,7 +39,8 @@ exports.getAllMyFriend = async (userId) => {
             friendAccount: friendInfo?.account,
             friendNickname: friendInfo?.nickname,
             friendAvatar: friendInfo?.avatar,
-            friendEmail: friendInfo?.email
+            friendEmail: friendInfo?.email,
+            isOnline: friendInfo?.isOnline,
         }
     })
     return resp
