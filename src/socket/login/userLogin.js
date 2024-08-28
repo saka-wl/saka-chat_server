@@ -1,7 +1,7 @@
 
 const { verifyJWT } = require("../../utils/jwt")
 const userFriendModel = require('../../model/userFriendModel')
-const { Op, where } = require("sequelize")
+const { Op } = require("sequelize")
 const userModel = require("../../model/userModel")
 
 /**
@@ -18,15 +18,15 @@ module.exports = async (socket, usersMap, data) => {
     }
 
     if(usersMap.has(~~userId)) {
-        usersMap.del(~~userId)
+        usersMap.delete(~~userId)
     }
     usersMap.set(~~userId, socket.id);
     // 更新数据库在线状态
-    userModel.update({ isOnline: true }, { id: ~~userId });
+    await userModel.update({ isOnline: true }, { where: { id: ~~userId } });
     // 寻找他的好友，查看是否在线，在线就通知好友其上线了
     const allFriends = await userFriendModel.findAll({ where: { [Op.or]: [{ userId: userId + '' }, { friendId: userId + '' }] } });
     for(let item of allFriends) {
-        let tmpId = ''
+        let tmpId = '';
         if(item.friendId != userId) {
             tmpId = item.friendId;
         }
@@ -34,8 +34,7 @@ module.exports = async (socket, usersMap, data) => {
             tmpId = item.userId;
         }
         if(usersMap.has(~~tmpId)) {
-            socket.to(usersMap.get(~~tmpId)).emit('friendOnline', tmpId);
+            socket.to(usersMap.get(~~tmpId)).emit('friendOnlineChange', tmpId, true);
         }
     }
-
 }

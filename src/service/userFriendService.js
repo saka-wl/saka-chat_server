@@ -21,7 +21,7 @@ exports.getAllMyFriend = async (userId) => {
         if(userId != it.friendId) {
             needUserInfo.add(it.friendId)
         }
-        return objFormat(it.dataValues, 1, 'updatedAt', 'createdAt', 'deletedAt')
+        return objFormat(it.dataValues, 1, 'updatedAt', 'createdAt', 'deletedAt');
     })
     needUserInfo = Array.from(needUserInfo)
     const userInfos = await userModel.findAll({ where: { id: { [Op.or]: needUserInfo } } })

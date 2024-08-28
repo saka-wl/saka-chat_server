@@ -1,10 +1,13 @@
 
 const { Server } = require("socket.io");
-const loginServer = require("./login/index")
+
 const { sendMsgToFriend } = require("./friendChat/index");
 const NodeCache = require("node-cache");
+const loginServer = require("./login/userLogin");
+const logoutServer = require("./login/userLogout")
 
-const usersMap = new NodeCache({ })
+// const usersMap = new NodeCache({ })
+const usersMap = new Map();
 
 module.exports = function (server) {
     const io = new Server(server, {
@@ -24,6 +27,16 @@ module.exports = function (server) {
          * 聊天后端登录验证
          * 更新后端userMap中用户在线信息
          */
-        socket.on("userLogin", (data) => loginServer(socket, usersMap, data))
+        socket.on("userLogin", (data) => loginServer(socket, usersMap, data));
+
+        /**
+         * 用户主动退出登录
+         */
+        socket.on("userLogout", (data) => logoutServer(socket, usersMap, data));
+
+        /**
+         * 用户直接退出
+         */
+        socket.on('disconnect', () => logoutServer(socket, usersMap));
     });
 }
