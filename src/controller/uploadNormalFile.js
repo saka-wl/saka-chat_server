@@ -32,7 +32,7 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
                 // 正确的处理
                 cb(null, true);
             } else {
-                cb(new Error("please choose a picture!")); // 后缀名错误则抛出错误，等待后面的中间件捕获
+                cb(new Error("please choose a allowed file!")); // 后缀名错误则抛出错误，等待后面的中间件捕获
             }
         },
     })
@@ -40,9 +40,14 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
 
 const imageExt = [".jpg",".tiff",".gif",".svg",".jfif",".webp",".png",".bmp"]
 const normalImageFilePath = path.resolve(__dirname, "../files/normalFiles/Images")
-
-router.post("/single/image", upload(normalImageFilePath, ~~process.env.NORMAL_FILE_LINIT_SIZE, imageExt).single("file"), (req, res) => {
+router.post("/single/image", upload(normalImageFilePath, ~~process.env.NORMAL_IMAGE_FILE_LINIT_SIZE, imageExt).single("file"), (req, res) => {
     res.send(returnFormat(200, req.file.filename, "上传成功！"));
 });
+
+const fileExt = ['.mp4', '.mp3', '.zip'];
+const normalFilePath = path.resolve(__dirname, "../files/normalFiles/Files")
+router.post("/single/normalfile", upload(normalFilePath, ~~process.env.NORMAL_FILE_LIMIT_SIZE, fileExt).single("file"), (req, res) => {
+    res.send(returnFormat(200, req.file.filename, "上传成功！"));
+})
 
 module.exports = router;
