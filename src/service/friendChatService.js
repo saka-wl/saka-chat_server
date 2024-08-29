@@ -44,13 +44,13 @@ exports.getNewChatMessageList = async (userId, chatRoomId) => {
         status: 2,
         messageType: 'string'
     };
-    const chatMsg = await chatMessageModel.findAll({ where: { [Op.or]: [ obj, { chatRoomId: chatRoomId.toString() } ] }, order: [['createdAt', 'ASC']] });
+    const chatMsg = await chatMessageModel.findAll({ where: { [Op.or]: [ obj, { chatRoomId: chatRoomId.toString() }, { chatRoomId: ~~chatRoomId } ] }, order: [['createdAt', 'ASC']] });
     const needFrinedInfoId = new Set();
     chatMsg.forEach((it, index) => {
         chatMsg[index] = objFormat(it.dataValues, 1, 'updatedAt', 'deletedAt');
         if (chatMsg[index].fromUserId !== chatMsg[index].toUserId) needFrinedInfoId.add(~~chatMsg[index].fromUserId);
     })
-    const friendsInfo = await userModel.findAll({ where: { id: { [Op.or]: Array.from(needFrinedInfoId) } } })
+    const friendsInfo = await userModel.findAll({ where: { id: { [Op.or]: Array.from(needFrinedInfoId) } } });
     let resp = {};
     for(let item of chatMsg) {
         if (!resp[item.chatRoomId]) {

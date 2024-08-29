@@ -34,7 +34,7 @@ module.exports = async (socket, usersMap, data) => {
             tmpId = item.userId;
         }
         if(usersMap.has(~~tmpId)) {
-            socket.to(usersMap.get(~~tmpId)).emit('friendOnlineChange', tmpId, true);
+            socket.to(usersMap.get(~~tmpId)).emit('friendOnlineChange', userId, true);
         }
     }
 }
