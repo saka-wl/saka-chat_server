@@ -22,7 +22,8 @@ module.exports = sequelize.define("LargeFile", {
     // 1 正常； 0 删除； -1 封禁
     status: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 1,
     },
     /**
      * 文件的剩余hash与已上传hash
@@ -35,6 +36,12 @@ module.exports = sequelize.define("LargeFile", {
     fileUploadInfo: {
         type: DataTypes.STRING(400),
         allowNull: true
+    },
+    // 1 -> 普通文件；2 -> 大文件；3 -> 视频流小文件；4 -> 视频流大文件
+    fileType: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1
     }
 }, {
     freezeTableName: true,
