@@ -9,7 +9,7 @@ const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
         storage: multer.diskStorage({
             destination: function (req, file, cb) {
                 // 存储在指定位置
-                cb(null, filePath + '/' + req.body.data.fileId);
+                cb(null, filePath + '/' + req.query.fileId);
             },
             filename: function (req, file, cb) {
                 cb(null, file.originalname);
@@ -45,7 +45,7 @@ const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
  * 添加大文件md5分片信息
  */
 router.post('/editNewFileInfo', async (req, res) => {
-    const resp = await editNewFileInfo(req.body.data);
+    const resp = await editNewFileInfo(req.body);
     res.send(resp);
 });
 
@@ -56,8 +56,8 @@ const largeFilePath = path.resolve(__dirname, "../files/largeFiles/fileStream");
  * chunkHash 文件分片md5
  * fileId 文件整体id
  */
-router.post('/uploadFileChunk', upload(largeFilePath), async (req, res) => {
-    const resp = await addFileChunk(req.body.data);
+router.post('/uploadFileChunk', upload(largeFilePath).single("file"), async (req, res) => {
+    const resp = await addFileChunk(req.body);
     res.send(resp);
 });
 
