@@ -1,7 +1,7 @@
 const path = require("path");
+const fs = require('fs');
 
 const fileChunkPath = path.join(__dirname, "../files/largeFiles/fileStream");
-
 const filePath = path.join(__dirname, "../files/largeFiles/file");
 
 /**
@@ -24,18 +24,15 @@ async function isFileExists(path) {
  * @param {*} fileChunkHashs 
  */
 exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
-    const target = fileId + '-' + fileName;
-    if(isFileExists(target)) {
-        return target;
-    }
-    async function _move(chunkId) {
+    const target = path.resolve(filePath, fileId + '-' + fileName);
+    async function _addChunk(chunkId) {
         const chunkPath = path.join(fileChunkPath, chunkId);
         // 获取分片信息
         const buffer = await fs.promises.readFile(chunkPath);
         await fs.promises.appendFile(target, buffer);
     }
     for (const chunkId of fileChunkHashs) {
-        await _move(chunkId);
+        await _addChunk(chunkId);
     }
     return target
 };

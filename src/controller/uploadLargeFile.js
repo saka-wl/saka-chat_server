@@ -1,5 +1,5 @@
 const express = require('express');
-const { editNewFileInfo } = require('../service/uploadFileService');
+const { editNewFileInfo, addFileChunk } = require('../service/uploadFileService');
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
@@ -9,10 +9,11 @@ const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
         storage: multer.diskStorage({
             destination: function (req, file, cb) {
                 // 存储在指定位置
-                cb(null, filePath + '/' + req.query.fileId);
+                // console.log(path.join(filePath, req.query.fileId));
+                cb(null, filePath);
             },
             filename: function (req, file, cb) {
-                cb(null, file.originalname);
+                cb(null, req.query.chunkHash);
             },
         }),
         limits: {
@@ -32,7 +33,7 @@ const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
                 cb(new Error("please choose a allowed file!")); // 后缀名错误则抛出错误，等待后面的中间件捕获
             }
         },
-    })
+    });
 }
 
 /**
@@ -56,9 +57,13 @@ const largeFilePath = path.resolve(__dirname, "../files/largeFiles/fileStream");
  * chunkHash 文件分片md5
  * fileId 文件整体id
  */
-router.post('/uploadFileChunk', upload(largeFilePath).single("file"), async (req, res) => {
-    const resp = await addFileChunk(req.body);
-    res.send(resp);
-});
+router.post(
+    '/uploadFileChunk',
+    upload(largeFilePath).single("file"), 
+    async (req, res) => {
+        const resp = await addFileChunk(req.query);
+        res.send(resp);
+    }
+);
 
 module.exports = router;
