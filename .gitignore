@@ -3,4 +3,7 @@
 
 /node_modules
 
-/src/files
+/src/files/largeFiles/file
+/src/files/largeFiles/fileStream
+/src/files/normalFiles/Files
+/src/files/normalFiles/Images
