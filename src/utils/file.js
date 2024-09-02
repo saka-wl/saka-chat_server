@@ -24,7 +24,7 @@ async function isFileExists(path) {
  * @param {*} fileChunkHashs 
  */
 exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
-    const target = path.resolve(filePath, fileId + '-' + fileName);
+    const target = path.resolve(filePath, fileId + path.extname(fileName));
     async function _addChunk(chunkId) {
         const chunkPath = path.join(fileChunkPath, chunkId);
         // 获取分片信息

@@ -62,6 +62,7 @@ router.post(
     upload(largeFilePath).single("file"), 
     async (req, res) => {
         const resp = await addFileChunk(req.query);
+        console.log(resp);
         res.send(resp);
     }
 );

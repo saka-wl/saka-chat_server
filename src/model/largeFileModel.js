@@ -34,7 +34,7 @@ module.exports = sequelize.define("LargeFile", {
      * }
      */
     fileUploadInfo: {
-        type: DataTypes.STRING(400),
+        type: DataTypes.STRING(2000),
         allowNull: true
     },
     // 1 -> 普通文件；2 -> 大文件；3 -> 视频流小文件；4 -> 视频流大文件
