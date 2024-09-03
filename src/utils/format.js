@@ -38,3 +38,7 @@ exports.isObjAllow = (obj, ...args) => {
     }
     return true;
 }
+
+exports.isValueNull = (val) => {
+    return val === null || val === undefined || val === '';
+}

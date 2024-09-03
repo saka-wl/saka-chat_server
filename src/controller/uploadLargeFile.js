@@ -1,8 +1,9 @@
 const express = require('express');
-const { editNewFileInfo, addFileChunk } = require('../service/uploadFileService');
+const { editNewFileInfo, addFileChunk, getFileInfo } = require('../service/uploadFileService');
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
+const { returnFormat } = require('../utils/format');
 
 const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
     return multer({
@@ -65,5 +66,20 @@ router.post(
         res.send(resp);
     }
 );
+
+router.post(
+    '/getfileinfo',
+    async (req, res) => {
+        const resp = await getFileInfo(req.body);
+        res.send(returnFormat(200, resp, ''));
+    }
+)
+
+router.get(
+    '/getfilechunk',
+    async (req, res) => {
+        const chunkHash = req.query.chunkHash;
+    }
+)
 
 module.exports = router;

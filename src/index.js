@@ -18,9 +18,11 @@ app.use(require("./utils/cors"));
 app.use(require('./utils/tokenMiddleWare'))
 
 /**
- * 挂载静态资源
+ * 挂载静态资源 - 普通图片资源
  */
-app.use('/static/images', express.static(path.resolve(__dirname, "./files/normalFiles/Images")))
+app.use('/static/images', express.static(path.resolve(__dirname, "./files/normalFiles/Images")));
+app.use('/static/largeFile', express.static(path.resolve(__dirname, "./files/largeFiles/file")));
+// app.use('/static/largeFileChunk', express.static(path.resolve(__dirname, "./files/largeFiles/fileStream")));
 
 /**
  * /c 无鉴权c端接口

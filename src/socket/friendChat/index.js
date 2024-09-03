@@ -17,10 +17,10 @@ exports.sendMsgToFriend = async (socket, usersMap, data) => {
     if(res === false || userId != res.id || !friendId) {
         return;
     }
-    const friendSocketId = usersMap.get(~~friendId) || usersMap.get(friendId.toString())
-    const userSocketId = usersMap.get(~~userId) || usersMap.get(userId.toString())
+    const friendSocketId = usersMap.get(~~friendId) || usersMap.get(friendId.toString());
+    const userSocketId = usersMap.get(~~userId) || usersMap.get(userId.toString());
     // 1. 更新数据库消息，不需要异步await等待
-    const resp = await saveMessage(data)
+    const resp = await saveMessage(data);
     if(userSocketId) {
         // console.log(friendId, userSocket);
         // userSocket.sendMessage('getMsgFromMine', objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
