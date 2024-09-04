@@ -4,6 +4,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const { returnFormat } = require('../utils/format');
+const { createReadStream } = require('fs');
 
 const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
     return multer({
@@ -79,6 +80,12 @@ router.get(
     '/getfilechunk',
     async (req, res) => {
         const chunkHash = req.query.chunkHash;
+        const filePath = path.join(__dirname, '../files/largeFiles/fileStream', chunkHash);
+        res.set({
+            'content-type': 'application/octet-stream',
+            'content-disposition': 'attachment;filename=' + encodeURI(chunkHash)
+        })
+        createReadStream(filePath).pipe(res);
     }
 )
 
