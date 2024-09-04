@@ -19,7 +19,7 @@ module.exports = sequelize.define("ChatMessage", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    // string | file | pic
+    // string | file | pic | video
     messageType: {
         type: DataTypes.STRING,
         allowNull: false

@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require('fs');
+const { exec } = require("child_process");
 
 const fileChunkPath = path.join(__dirname, "../files/largeFiles/fileStream");
 const filePath = path.join(__dirname, "../files/largeFiles/file");
@@ -18,9 +19,12 @@ async function isFileExists(path) {
     }
 }
 
+function transformFfmpeg(sourceFile, outputStream) {
+    exec(`ffmpeg -i ${sourceFile} -movflags frag_keyframe+empty_moov ${outputStream}`);
+}
+
 /**
  * 合并文件切片
- * 文件切片hash是反的！
  * @param {*} fileChunkHashs 
  */
 exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
@@ -34,5 +38,8 @@ exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
     for (const chunkId of fileChunkHashs) {
         await _addChunk(chunkId);
     }
-    return target
+    if(fileName.endsWith('.mp4')) {
+        transformFfmpeg(target, path.resolve(filePath, 'ffmpeg-' +fileId + path.extname(fileName)));
+    }
+    return target;
 };

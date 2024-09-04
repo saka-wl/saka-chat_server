@@ -22,7 +22,6 @@ app.use(require('./utils/tokenMiddleWare'))
  */
 app.use('/static/images', express.static(path.resolve(__dirname, "./files/normalFiles/Images")));
 app.use('/static/largeFile', express.static(path.resolve(__dirname, "./files/largeFiles/file")));
-// app.use('/static/largeFileChunk', express.static(path.resolve(__dirname, "./files/largeFiles/fileStream")));
 
 /**
  * /c 无鉴权c端接口
@@ -39,6 +38,7 @@ app.use("/api/c/friendchat", require("./controller/friendChatController"));
  */
 app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
 app.use('/common/uploadLargeFile', require("./controller/uploadLargeFile"));
+app.use('/common/download/video', require("./controller/downloadVideo"));
 
 /**
  * 错误捕获中间件
