@@ -20,7 +20,8 @@ async function isFileExists(path) {
 }
 
 function transformFfmpeg(sourceFile, outputStream) {
-    exec(`ffmpeg -i ${sourceFile} -movflags frag_keyframe+empty_moov ${outputStream}`);
+    exec(`mp4fragment ${sourceFile} ${outputStream}`);
+    // exec(`ffmpeg -i ${sourceFile} -movflags frag_keyframe+empty_moov ${outputStream}`);
 }
 
 /**

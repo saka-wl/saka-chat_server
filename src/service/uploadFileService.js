@@ -11,7 +11,7 @@ const { combineFile } = require("../utils/file");
 exports.editNewFileInfo = async (data) => {
     data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo');
     data.fileType = 2;
-    if (fileName.endsWith('.mp4')) data.fileType = 4;
+    if (data.fileName.endsWith('.mp4')) data.fileType = 4;
     data.pwd = !isValueNull(data.pwd) ? data.pwd : null;
     if (data.fileUploadInfo && typeof data.fileUploadInfo === 'object') {
         data.fileUploadInfo = JSON.stringify(data.fileUploadInfo);
