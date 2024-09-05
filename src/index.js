@@ -14,22 +14,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(require("./utils/cors"));
 
+// 鉴权判定
+app.use(require('./utils/tokenMiddleWare'))
+
 /**
- * 挂载静态资源
+ * 挂载静态资源 - 普通图片资源
  */
-app.use('/static/images', express.static(path.resolve(__dirname, "./files/normalFiles/Images")))
+app.use('/static/images', express.static(path.resolve(__dirname, "./files/normalFiles/Images")));
+app.use('/static/largeFile', express.static(path.resolve(__dirname, "./files/largeFiles/file")));
 
 /**
  * /c 无鉴权c端接口
- * /superc 有鉴权c端接口
+ * /.../super/... 有鉴权c端接口
  */
 app.use("/api/c/user", require("./controller/userController"));
 app.use("/api/c/captcha", require("./controller/captcha"));
+app.use("/api/c/friend", require("./controller/friendController"));
+app.use("/api/c/friendchat", require("./controller/friendChatController"));
+
 
 /**
  * 工具api
  */
 app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
+app.use('/common/uploadLargeFile', require("./controller/uploadLargeFile"));
+app.use('/common/download', require("./controller/downloadVideo"));
 
 /**
  * 错误捕获中间件
@@ -39,7 +48,7 @@ app.use(function (err, req, res, next) {
 });
 
 const port = process.env.SERVER_PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log("Server is listenning in http://localhost:" + port);
 });
 
@@ -47,3 +56,9 @@ app.listen(port, () => {
  * 存储session
  */
 exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE, checkperiod: process.env.CAPTCHA_SESSION_CLEAR_TIME })
+
+/**
+ * socket 挂载实时聊天
+ */
+const socket = require('./socket/index')
+socket(server)

@@ -4,6 +4,7 @@ const router = express.Router();
 const path = require("path");
 const { returnFormat } = require("../utils/format");
 const { v4: uuidv4 } = require('uuid');
+const largeFileModel = require("../model/largeFileModel");
 
 const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
     return multer({
@@ -32,7 +33,7 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
                 // 正确的处理
                 cb(null, true);
             } else {
-                cb(new Error("please choose a picture!")); // 后缀名错误则抛出错误，等待后面的中间件捕获
+                cb(new Error("please choose a allowed file!")); // 后缀名错误则抛出错误，等待后面的中间件捕获
             }
         },
     })
@@ -40,9 +41,39 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
 
 const imageExt = [".jpg",".tiff",".gif",".svg",".jfif",".webp",".png",".bmp"]
 const normalImageFilePath = path.resolve(__dirname, "../files/normalFiles/Images")
-
-router.post("/single/image", upload(normalImageFilePath, ~~process.env.NORMAL_FILE_LINIT_SIZE, imageExt).single("file"), (req, res) => {
+router.post("/single/image", upload(normalImageFilePath, ~~process.env.NORMAL_IMAGE_FILE_LINIT_SIZE, imageExt).single("file"), (req, res) => {
     res.send(returnFormat(200, req.file.filename, "上传成功！"));
 });
+
+const fileExt = ['.mp4', '.mp3', '.zip'];
+const normalFilePath = path.resolve(__dirname, "../files/normalFiles/Files")
+router.post(
+    "/single/normalfile", 
+    async (req, res, next) => {
+        // 如果已经上传过了
+        const hash = req.query.hash;
+        if(!hash) {
+            res.send(returnFormat(200, undefined, "上传失败，未携带文件hash！"));
+            return;
+        }
+        let resp = await largeFileModel.findAll({ where: { fileId: hash } });
+        if(resp.length !== 0) {
+            res.send(returnFormat(200, resp[0].dataValues.fileName, "上传成功！"));
+            return;
+        }
+        next();
+    }, 
+    upload(normalFilePath, ~~process.env.NORMAL_FILE_LIMIT_SIZE).single("file"),
+    async (req, res) => {
+        await largeFileModel.create({
+            fileName: req.file.filename,
+            fileId: req.query.hash,
+            fileType: 1,
+            fileUploadInfo: JSON.stringify([]),
+            ownUserId: req.query.ownUserId || '0',
+        })
+        res.send(returnFormat(200, req.file.filename, '上传成功！'))
+    }
+)
 
 module.exports = router;

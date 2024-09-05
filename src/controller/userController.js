@@ -1,8 +1,7 @@
 const express = require('express')
 const { verify } = require('../utils/session')
 const { returnFormat } = require('../utils/format')
-const { enroll, login, autoLogin } = require('../service/userService')
-const { verifyJWT } = require('../utils/jwt')
+const { enroll, login, autoLogin, searchUser } = require('../service/userService')
 const router = express.Router()
 
 router.post('/login', async (req, res, next) => {
@@ -46,23 +45,23 @@ router.post('/enroll', async (req, res, next) => {
 })
 
 // 自动登录
-router.get('/whoami', async (req, res, next) => {
-    const token = req.headers['authorization']
-    if(!token) {
-        res.send(returnFormat(401, undefined, "请重新登录！"))
-        return;
-    }
-    const jwtVerifyRes = verifyJWT(token)
-    console.log(jwtVerifyRes)
-    if(jwtVerifyRes === false || !jwtVerifyRes.id) {
-        res.send(returnFormat(401, undefined, "请重新登录！"))
-        return;
-    }
-    res.send(await autoLogin(jwtVerifyRes.account, jwtVerifyRes.id))
+router.get('/super/whoami', async (req, res, next) => {
+    const userInfo = req.userInfo
+    res.send(await autoLogin(userInfo.account, userInfo.id))
 })
 
 router.put('/', (req, res, next) => {
 
+})
+
+router.post('/super/searchUser', async (req, res, next) => {
+    const resp = await searchUser({
+        account: req.body.account,
+        nickname: req.body.nickname,
+        friendId: req.body.id,
+        userId: req.body.userId
+    })
+    res.send(returnFormat(200, resp, "查询成功！"))
 })
 
 module.exports = router

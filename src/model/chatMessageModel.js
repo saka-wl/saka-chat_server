@@ -1,35 +1,34 @@
+
 const { DataTypes } = require('sequelize')
 const sequelize = require('../db/db')
 
-module.exports = sequelize.define("User", {
-    phone: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    account: {
+module.exports = sequelize.define("ChatMessage", {
+    chatRoomId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    password: {
+    fromUserId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    nickname: {
+    toUserId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    avatar: {
+    messageInfo: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: false
     },
-    isOnline: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+    // string | file | pic | video
+    messageType: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    // 2 需显示消息； 1 正常消息； 0 过时消息； -1 已删除消息； -2 撤回消息
+    status: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: 1
     }
 }, {
     freezeTableName: true,

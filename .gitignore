@@ -6,4 +6,8 @@
 /src/files/largeFiles/file
 /src/files/largeFiles/fileStream
 /src/files/normalFiles/Files
+<<<<<<< HEAD
 /src/files/normalFiles/Images
+=======
+/src/files/normalFiles/Images
+>>>>>>> main

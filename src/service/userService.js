@@ -3,6 +3,8 @@ const UserModel = require("../model/userModel")
 const md5 = require('md5');
 const { returnFormat } = require("../utils/format");
 const { encipherJWT } = require("../utils/jwt");
+const UserFriendModel = require("../model/userFriendModel");
+const { Op } = require("sequelize");
 
 exports.login = async (account, password) => {
     const md5Password = md5(password);
@@ -67,4 +69,51 @@ exports.enroll = async (account, password, nickname, phone, email, avatar) => {
         console.log(err)
         return returnFormat(500, undefined, "服务器错误！")
     }
+}
+
+exports.searchUser = async ({
+    account,
+    nickname,
+    userId,
+    friendId
+}) => {
+    let obj = {}
+    if(account) obj.account = account;
+    if(nickname) obj.nickname = nickname;
+    if(friendId) obj.id = friendId;
+
+    const userCurrentFriends = await UserFriendModel.findAll({ where: { [Op.or]: [{ userId: userId }, { friendId: userId }] } })
+    const userCurrentFriendsIds = []
+    for(let item of userCurrentFriends) {
+        if(userId == item.userId) {
+            userCurrentFriendsIds.push(~~item.friendId)
+        }else if(userId == item.friendId) {
+            userCurrentFriendsIds.push(~~item.userId)
+        }
+    }
+
+    const resp = await UserModel.findAll({
+        where: obj
+    });
+    const res = []
+    for(let item of resp) {
+        if(item.dataValues.id === userId) {
+            continue
+        }
+        if(userCurrentFriendsIds.includes(~~item.id)) {
+            res.push({
+                ... item.dataValues,
+                password: "***",
+                hasAddFriend: true
+            })
+        }else{
+            res.push({
+                ... item.dataValues,
+                password: "***",
+                hasAddFriend: false
+            })
+        }
+    }
+
+    return res;
 }

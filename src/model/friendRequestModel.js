@@ -1,33 +1,22 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../db/db')
 
-module.exports = sequelize.define("User", {
-    phone: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    account: {
+module.exports = sequelize.define("FriendRequest", {
+    fromUserId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    password: {
+    toUserId: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    nickname: {
+    requestMessage: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    avatar: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    isOnline: {
-        type: DataTypes.BOOLEAN,
+    // -1 拒绝； 0 待处理； 1 同意
+    isDispose: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: false
     }
