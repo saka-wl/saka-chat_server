@@ -43,3 +43,17 @@ exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
     }
     return target;
 };
+
+/**
+ * 获取文件大小size
+ * @param {*} path 
+ * @returns 
+ */
+exports.getFileSize = async (path) => {
+    try {
+        const stat = await fs.promises.stat(path);
+        return stat.size;
+    } catch (err) {
+        return null;
+    }
+}

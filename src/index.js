@@ -38,7 +38,7 @@ app.use("/api/c/friendchat", require("./controller/friendChatController"));
  */
 app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
 app.use('/common/uploadLargeFile', require("./controller/uploadLargeFile"));
-app.use('/common/download/video', require("./controller/downloadVideo"));
+app.use('/common/download', require("./controller/downloadVideo"));
 
 /**
  * 错误捕获中间件
