@@ -19,13 +19,13 @@ router.get("/video/:filename", (req, res) => {
         const parts = range.replace(/bytes=/, '').split('-');
         const start = Number(parts[0]);
         const end = Number(parts[1]) || stat.size - 1
-        // const headers = {
-        //     "Content-Range": `bytes ${start}-${end}/${stat.size}`,
-        //     "Accept-Ranges": "bytes",
-        //     "Content-Length": end - start + 1,
-        //     "Content-Type": "video/mp4",
-        // };
-        // res.writeHead(206, headers);
+        const headers = {
+            "Content-Range": `bytes ${start}-${end}/${stat.size}`,
+            "Accept-Ranges": "bytes",
+            "Content-Length": end - start + 1,
+            "Content-Type": "video/mp4",
+        };
+        res.writeHead(206, headers);
         fs.createReadStream(filename, {
             start,
             end

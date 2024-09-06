@@ -20,8 +20,9 @@ async function isFileExists(path) {
 }
 
 function transformFfmpeg(sourceFile, outputStream) {
-    // exec(`mp4fragment ${sourceFile} ${outputStream}`);
-    exec(`ffmpeg -i ${sourceFile} -movflags frag_keyframe+empty_moov ${outputStream}`);
+    exec(`mp4fragment ${sourceFile} ${outputStream}`);
+    // ffmpeg 无法处理
+    // exec(`ffmpeg -i ${sourceFile} -movflags frag_keyframe+empty_moov ${outputStream}`);
 }
 
 /**
@@ -30,6 +31,7 @@ function transformFfmpeg(sourceFile, outputStream) {
  */
 exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
     const target = path.resolve(filePath, fileId + path.extname(fileName));
+    if(isFileExists(target)) return target;
     async function _addChunk(chunkId) {
         const chunkPath = path.join(fileChunkPath, chunkId);
         // 获取分片信息

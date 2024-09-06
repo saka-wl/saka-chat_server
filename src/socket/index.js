@@ -2,12 +2,22 @@
 const { Server } = require("socket.io");
 
 const { sendMsgToFriend } = require("./friendChat/index");
-const NodeCache = require("node-cache");
 const loginServer = require("./login/userLogin");
-const logoutServer = require("./login/userLogout")
+const logoutServer = require("./login/userLogout");
+const userModel = require("../model/userModel");
 
 // const usersMap = new NodeCache({ })
 const usersMap = new Map();
+
+async function init() {
+    const resp = await userModel.findAll({ where: { isOnline: true } });
+    for(let item of resp) {
+        const tmp = item.dataValues;
+        usersMap.set(tmp.id, tmp.socketId);
+    }
+}
+
+init();
 
 module.exports = function (server) {
     const io = new Server(server, {

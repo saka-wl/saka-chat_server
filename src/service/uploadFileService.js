@@ -9,7 +9,7 @@ const { combineFile } = require("../utils/file");
  * @returns 
  */
 exports.editNewFileInfo = async (data) => {
-    data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo');
+    data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo', 'videoPreview');
     data.fileType = 2;
     if (data.fileName.endsWith('.mp4')) data.fileType = 4;
     data.pwd = !isValueNull(data.pwd) ? data.pwd : null;

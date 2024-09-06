@@ -29,7 +29,7 @@ module.exports = async (socket, usersMap, data = undefined) => {
         usersMap.delete(~~userId);
     }
     // 更新数据库在线状态
-    await userModel.update({ isOnline: false }, { where: { id: ~~userId } });
+    await userModel.update({ isOnline: false, socketId: null }, { where: { id: ~~userId } });
     // 寻找他的好友，查看是否在线，在线就通知好友其下线了
     const allFriends = await userFriendModel.findAll({ where: { [Op.or]: [{ userId: userId + '' }, { friendId: userId + '' }] } });
     for(let item of allFriends) {
