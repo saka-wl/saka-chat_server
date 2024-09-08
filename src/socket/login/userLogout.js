@@ -10,20 +10,15 @@ const { Op } = require("sequelize");
  * @param {*} usersMap 
  * @param {*} data 
  */
-module.exports = async (socket, usersMap, data = undefined) => {
+module.exports = async (socket, usersMap, data) => {
     let userId = data?.userId;
-    if(data) {
-        const res = verifyJWT(data.token);
-        if (res === false || userId != res.id) {
-            return;
-        }
-    }else{
-        for(const [key, value] of usersMap.entries()) {
-            if(value == socket.id) {
-                userId = key;
-            }
+    for(const [key, value] of usersMap.entries()) {
+        if(value == socket.id) {
+            userId = key;
+            break;
         }
     }
+    if(!userId) return;
 
     if(usersMap.has(~~userId)) {
         usersMap.delete(~~userId);

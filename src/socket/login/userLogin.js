@@ -18,7 +18,8 @@ module.exports = async (socket, usersMap, data) => {
     }
 
     if(usersMap.has(~~userId)) {
-        usersMap.delete(~~userId)
+        socket.to(usersMap.get(~~userId)).emit('userForceLogout');
+        usersMap.delete(~~userId);
     }
     usersMap.set(~~userId, socket.id);
     // 更新数据库在线状态

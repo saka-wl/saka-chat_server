@@ -9,23 +9,20 @@ const userModel = require("../model/userModel");
 // const usersMap = new NodeCache({ })
 const usersMap = new Map();
 
-async function init() {
-    const resp = await userModel.findAll({ where: { isOnline: true } });
-    for(let item of resp) {
-        const tmp = item.dataValues;
-        usersMap.set(tmp.id, tmp.socketId);
+exports.isUserOnline = (userId) => {
+    if(usersMap.has(~~userId)) {
+        return true;
     }
+    return false;
 }
 
-init();
-
-module.exports = function (server) {
+exports.socketApp = function (server) {
     const io = new Server(server, {
         cors: {
             origin: process.env.SOCKET_CORS_URL
         }
     });
-    io.on("connection", socket => {
+    io.on("connection", async (socket) => {
         /**
          * 监听用户发送的信息
          * 再将信息存储到数据库
