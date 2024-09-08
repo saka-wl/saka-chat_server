@@ -1,11 +1,10 @@
 
 const UserModel = require("../model/userModel")
 const md5 = require('md5');
-const { returnFormat } = require("../utils/format");
+const { returnFormat, objFormat } = require("../utils/format");
 const { encipherJWT } = require("../utils/jwt");
 const UserFriendModel = require("../model/userFriendModel");
 const { Op } = require("sequelize");
-const { isUserOnline } = require("../socket");
 
 exports.login = async (account, password) => {
     const md5Password = md5(password);
@@ -123,4 +122,21 @@ exports.searchUser = async ({
     }
 
     return res;
+}
+
+exports.changeUserInfo = async (data) => {
+    const account = data.account;
+    const id = data.id;
+    const originPassword = data.originPassword;
+    data = objFormat(data, 0, 'phone', 'email', 'nickname', 'avatar', 'password');
+    let whereObj = {
+        account,
+        id
+    }
+    if(data.password) {
+        whereObj.password = md5(originPassword);
+    }
+    await UserModel.update(data, {
+        where: whereObj
+    });
 }

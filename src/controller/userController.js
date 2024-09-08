@@ -1,7 +1,7 @@
 const express = require('express')
 const { verify } = require('../utils/session')
 const { returnFormat } = require('../utils/format')
-const { enroll, login, autoLogin, searchUser } = require('../service/userService')
+const { enroll, login, autoLogin, searchUser, changeUserInfo } = require('../service/userService')
 const router = express.Router()
 
 router.post('/login', async (req, res, next) => {
@@ -62,6 +62,11 @@ router.post('/super/searchUser', async (req, res, next) => {
         userId: req.body.userId
     })
     res.send(returnFormat(200, resp, "查询成功！"))
+})
+
+router.post('/super/changeUserInfo', async (req, res) => {
+    await changeUserInfo(req.body);
+    res.send(returnFormat(200, null, "修改成功！"));
 })
 
 module.exports = router
