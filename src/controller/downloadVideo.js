@@ -7,7 +7,6 @@ const { returnFormat } = require("../utils/format");
 
 router.get("/video/:filename", (req, res) => {
     const filename = path.resolve(__dirname, '../files/largeFiles/file', 'ffmpeg-' + req.params.filename);
-    console.log(filename);
     const extName = path.extname(filename);
     if (extName === '.mp4') {
         const stat = fs.statSync(filename);
