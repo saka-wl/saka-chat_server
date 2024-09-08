@@ -5,6 +5,7 @@ const { returnFormat } = require("../utils/format");
 const { encipherJWT } = require("../utils/jwt");
 const UserFriendModel = require("../model/userFriendModel");
 const { Op } = require("sequelize");
+const { isUserOnline } = require("../socket");
 
 exports.login = async (account, password) => {
     const md5Password = md5(password);
@@ -14,6 +15,9 @@ exports.login = async (account, password) => {
             password: md5Password
         }
     })
+    // if(isUserOnline(resp?.dataValues?.id)) {
+    //     return returnFormat(200, null, "您在其他地方已登录！")
+    // }
     if(resp?.dataValues?.id) {
         let token = encipherJWT({
             id: resp.dataValues.id,
@@ -27,6 +31,9 @@ exports.login = async (account, password) => {
 }
 
 exports.autoLogin = async (account, id) => {
+    // if(isUserOnline(id)) {
+    //     return returnFormat(200, null, "您在其他地方已登录！")
+    // }
     const resp = await UserModel.findOne({
         where: {
             account,

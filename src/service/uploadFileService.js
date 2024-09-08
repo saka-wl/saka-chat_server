@@ -9,7 +9,7 @@ const { combineFile } = require("../utils/file");
  * @returns 
  */
 exports.editNewFileInfo = async (data) => {
-    data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo');
+    data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo', 'videoPreview');
     data.fileType = 2;
     if (data.fileName.endsWith('.mp4')) data.fileType = 4;
     data.pwd = !isValueNull(data.pwd) ? data.pwd : null;
@@ -82,7 +82,6 @@ exports.addFileChunk = async (data) => {
     const tmp = { ... resp };
     tmp.fileUploadInfo = JSON.stringify(tmp.fileUploadInfo);
     await LargeFileModel.update(tmp, { where: { fileId: data.fileId, id: data.id } });
-
     if(resp.fileUploadInfo.needUploadedHash.length === 0) {
         // 返回文件合并路径
         const fileCombinePath = await combineFile(resp.fileUploadInfo.hasUploadedHash, resp.fileId, resp.fileName);

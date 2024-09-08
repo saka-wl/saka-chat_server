@@ -10,26 +10,21 @@ const { Op } = require("sequelize");
  * @param {*} usersMap 
  * @param {*} data 
  */
-module.exports = async (socket, usersMap, data = undefined) => {
+module.exports = async (socket, usersMap, data) => {
     let userId = data?.userId;
-    if(data) {
-        const res = verifyJWT(data.token);
-        if (res === false || userId != res.id) {
-            return;
-        }
-    }else{
-        for(const [key, value] of usersMap.entries()) {
-            if(value == socket.id) {
-                userId = key;
-            }
+    for(const [key, value] of usersMap.entries()) {
+        if(value == socket.id) {
+            userId = key;
+            break;
         }
     }
+    if(!userId) return;
 
     if(usersMap.has(~~userId)) {
         usersMap.delete(~~userId);
     }
     // 更新数据库在线状态
-    await userModel.update({ isOnline: false }, { where: { id: ~~userId } });
+    await userModel.update({ isOnline: false, socketId: null }, { where: { id: ~~userId } });
     // 寻找他的好友，查看是否在线，在线就通知好友其下线了
     const allFriends = await userFriendModel.findAll({ where: { [Op.or]: [{ userId: userId + '' }, { friendId: userId + '' }] } });
     for(let item of allFriends) {

@@ -39,11 +39,30 @@ const upload = (filePath, limit = 1024 * 1024 * 2, allowExt = null) => {
     })
 }
 
-const imageExt = [".jpg",".tiff",".gif",".svg",".jfif",".webp",".png",".bmp"]
+const uploadArr = multer({
+    storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.resolve(__dirname, '../files/normalFiles/Images')); // 指定存储的目录  
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname); // 生成唯一文件名  
+    }
+    })
+}).array("files");
+
+const imageExt = [".jpg",".tiff",".gif",".svg",".jfif",".webp",".png",".bmp"];
 const normalImageFilePath = path.resolve(__dirname, "../files/normalFiles/Images")
 router.post("/single/image", upload(normalImageFilePath, ~~process.env.NORMAL_IMAGE_FILE_LINIT_SIZE, imageExt).single("file"), (req, res) => {
     res.send(returnFormat(200, req.file.filename, "上传成功！"));
 });
+
+router.post('/many/images', uploadArr, async (req, res) => {
+    res.send({
+        code: 200,
+        data: "",
+        msg: ''
+    })
+})
 
 const fileExt = ['.mp4', '.mp3', '.zip'];
 const normalFilePath = path.resolve(__dirname, "../files/normalFiles/Files")

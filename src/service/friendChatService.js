@@ -15,7 +15,7 @@ exports.saveMessage = async (data) => {
         toUserId: data.friendId,
         messageInfo: data.message,
         messageType: data?.messageType || 'string',
-        status: data?.status || 1
+        status: data?.status || 2
     }
     return await chatMessageModel.create(savedObj)
 }
@@ -39,39 +39,53 @@ exports.getChatMessage = async (obj) => {
  * @returns 
  */
 exports.getNewChatMessageList = async (userId, chatRoomId) => {
-    let obj = {
-        toUserId: userId,
-        status: 2,
-        messageType: 'string'
-    };
-    const chatMsg = await chatMessageModel.findAll({ where: { [Op.or]: [ obj, { chatRoomId: chatRoomId.toString() }, { chatRoomId: ~~chatRoomId } ] }, order: [['createdAt', 'ASC']] });
-    const needFrinedInfoId = new Set();
-    chatMsg.forEach((it, index) => {
-        chatMsg[index] = objFormat(it.dataValues, 1, 'updatedAt', 'deletedAt');
-        if (chatMsg[index].fromUserId !== chatMsg[index].toUserId) needFrinedInfoId.add(~~chatMsg[index].fromUserId);
-    })
-    const friendsInfo = await userModel.findAll({ where: { id: { [Op.or]: Array.from(needFrinedInfoId) } } });
-    let resp = {};
-    for(let item of chatMsg) {
-        if (!resp[item.chatRoomId]) {
-            let friendInfo = objFormat(friendsInfo.find(it => it.id == item.fromUserId).dataValues, 1, 'updatedAt', 'deletedAt', 'password', 'id');
-            resp[item.chatRoomId] = { ... item, friendAccount: friendInfo.account, friendNickname: friendInfo.nickname, newMsgCount: 0 };
-            if(item.status === 2) resp[item.chatRoomId].newMsgCount ++;
+    // 新消息
+    let newChatMsg = await chatMessageModel.findAll(
+        { 
+            where: { 
+                [Op.or]: 
+                [ 
+                    {
+                        toUserId: userId,
+                        status: 2,
+                    }, 
+                    { 
+                        chatRoomId: chatRoomId.toString(),
+                        toUserId: userId,
+                    },
+                ]}, 
+            order: [['createdAt', 'ASC']] }
+    );
+    newChatMsg = newChatMsg.map(it => it.dataValues);
+    let newChatMsgRes = {};
+    for(let item of newChatMsg) {
+        if(item.chatRoomId == chatRoomId) {
+            newChatMsgRes[item.fromUserId] = 0;
             continue;
         }
-        let tmp = resp[item.chatRoomId];
-        if(tmp.status == 2) {
-            tmp.newMsgCount ++;
-        }
-        if(tmp.createdAt > item.createdAt) {
-            continue;
-        }
-        tmp = { ... tmp, ... item };
-        resp[item.chatRoomId] = tmp;
+        newChatMsgRes[item.fromUserId] = (newChatMsgRes[item.fromUserId] || 0) + 1;
     }
-    return resp;
+    // 旧消息, 5 天前
+    let historyChatMsg = await chatMessageModel.findAll({
+        where: {
+            toUserId: userId,
+            createdAt: {
+                [Op.gt]: new Date(new Date() - 5 * 24 * 60 * 60 * 1000)
+            }
+        }
+    });
+    let historyChatMsgRes = [];
+    for(let item of historyChatMsg) {
+        if(historyChatMsgRes.includes(item.dataValues.fromUserId)) continue;
+        historyChatMsgRes.push(item.dataValues.fromUserId);
+    }
+
+    return {
+        newChatMsgRes,
+        historyChatMsgRes
+    }
 }
 
-exports.changeNewMsgStatus = async (chatRoomId, toUserId) => {
-    await chatMessageModel.update({ status: 1 }, { where: { chatRoomId, toUserId } });
+exports.changeNewMsgStatus = async (chatRoomId, toUserId, status = 1) => {
+    await chatMessageModel.update({ status }, { where: { chatRoomId, toUserId } });
 }

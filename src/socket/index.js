@@ -2,20 +2,27 @@
 const { Server } = require("socket.io");
 
 const { sendMsgToFriend } = require("./friendChat/index");
-const NodeCache = require("node-cache");
 const loginServer = require("./login/userLogin");
-const logoutServer = require("./login/userLogout")
+const logoutServer = require("./login/userLogout");
+const userModel = require("../model/userModel");
 
 // const usersMap = new NodeCache({ })
 const usersMap = new Map();
 
-module.exports = function (server) {
+exports.isUserOnline = (userId) => {
+    if(usersMap.has(~~userId)) {
+        return true;
+    }
+    return false;
+}
+
+exports.socketApp = function (server) {
     const io = new Server(server, {
         cors: {
             origin: process.env.SOCKET_CORS_URL
         }
     });
-    io.on("connection", socket => {
+    io.on("connection", async (socket) => {
         /**
          * 监听用户发送的信息
          * 再将信息存储到数据库
