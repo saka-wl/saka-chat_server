@@ -136,7 +136,8 @@ exports.changeUserInfo = async (data) => {
     if(data.password) {
         whereObj.password = md5(originPassword);
     }
-    await UserModel.update(data, {
+    const resp = await UserModel.update(data, {
         where: whereObj
     });
+    console.log(resp);
 }

@@ -65,8 +65,8 @@ router.post('/super/searchUser', async (req, res, next) => {
 })
 
 router.post('/super/changeUserInfo', async (req, res) => {
-    await changeUserInfo(req.body);
-    res.send(returnFormat(200, null, "修改成功！"));
+    await changeUserInfo(req.body.filter(it => it));
+    res.send(returnFormat(200, true, "修改成功！"));
 })
 
 module.exports = router
