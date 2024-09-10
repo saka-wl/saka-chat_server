@@ -1,6 +1,6 @@
 
 const userModel = require("../../model/userModel");
-const { saveMessage } = require("../../service/friendChatService");
+const { saveMessage, changeMsgStatus } = require("../../service/friendChatService");
 const { objFormat } = require("../../utils/format");
 const { verifyJWT } = require("../../utils/jwt")
 
@@ -34,4 +34,25 @@ exports.sendMsgToFriend = async (socket, usersMap, data) => {
         return;
     }
     socket.to(friendSocketId).emit('getMsgFromFriend', objFormat(resp.dataValues, 1, 'updatedAt', 'deletedAt'));
+}
+
+/**
+ * 撤回消息
+ * @param {*} socket 
+ * @param {*} usersMap 
+ * @param {*} data id, toUserId, status?
+ */
+exports.userFriendWithDrawMsg = async (socket, usersMap, data) => {
+    if(!data.id) return;
+    // 1. 修改数据库中消息状态
+    data.status = -2;
+    await changeMsgStatus(data.id, data.status);
+    // 2. 发送socket提醒
+    const toUserId = data.toUserId;
+    const toUserSocketId = usersMap.get(~~toUserId) || usersMap.get(toUserId.toString());
+    if(!toUserSocketId) {
+        // 对方不在线，不必socket.emit
+        return;
+    }
+    socket.to(toUserSocketId).emit('userFriendWithDrawMsg', data.id);
 }

@@ -1,10 +1,9 @@
 
 const { Server } = require("socket.io");
 
-const { sendMsgToFriend } = require("./friendChat/index");
+const { sendMsgToFriend, userFriendWithDrawMsg } = require("./friendChat/index");
 const loginServer = require("./login/userLogin");
 const logoutServer = require("./login/userLogout");
-const userModel = require("../model/userModel");
 
 // const usersMap = new NodeCache({ })
 const usersMap = new Map();
@@ -40,6 +39,11 @@ exports.socketApp = function (server) {
          * 用户主动退出登录
          */
         socket.on("userLogout", (data) => logoutServer(socket, usersMap, data));
+
+        /**
+         * 用户撤回消息
+         */
+        socket.on('userFriendWithDrawMsg', (data) => userFriendWithDrawMsg(socket, usersMap, data));
 
         /**
          * 用户直接退出

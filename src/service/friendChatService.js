@@ -89,3 +89,9 @@ exports.getNewChatMessageList = async (userId, chatRoomId) => {
 exports.changeNewMsgStatus = async (chatRoomId, toUserId, status = 1) => {
     await chatMessageModel.update({ status }, { where: { chatRoomId, toUserId } });
 }
+
+exports.changeMsgStatus = async (id, obj) => {
+    if(!id) return;
+    obj = objFormat(obj, 0, 'status', 'messageInfo');
+    await chatMessageModel.update(obj, { where: { id } });
+}
