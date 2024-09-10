@@ -42,3 +42,12 @@ exports.isObjAllow = (obj, ...args) => {
 exports.isValueNull = (val) => {
     return val === null || val === undefined || val === '';
 }
+
+exports.deleteObjNullKeys = (obj) => {
+    return Object.keys(obj).reduce((acc, key) => {
+        if(obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
+            acc[key] = obj[key];
+        }
+        return acc;
+    }, {});
+}

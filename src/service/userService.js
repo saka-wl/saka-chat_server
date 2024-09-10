@@ -14,9 +14,6 @@ exports.login = async (account, password) => {
             password: md5Password
         }
     })
-    // if(isUserOnline(resp?.dataValues?.id)) {
-    //     return returnFormat(200, null, "您在其他地方已登录！")
-    // }
     if(resp?.dataValues?.id) {
         let token = encipherJWT({
             id: resp.dataValues.id,
@@ -30,9 +27,6 @@ exports.login = async (account, password) => {
 }
 
 exports.autoLogin = async (account, id) => {
-    // if(isUserOnline(id)) {
-    //     return returnFormat(200, null, "您在其他地方已登录！")
-    // }
     const resp = await UserModel.findOne({
         where: {
             account,
@@ -131,13 +125,25 @@ exports.changeUserInfo = async (data) => {
     data = objFormat(data, 0, 'phone', 'email', 'nickname', 'avatar', 'password');
     let whereObj = {
         account,
-        id
+        id: ~~id
     }
-    if(data.password) {
+    if(originPassword && data.password) {
         whereObj.password = md5(originPassword);
+        data.password = md5(data.password);
+    }else{
+        delete data.password;
     }
-    const resp = await UserModel.update(data, {
+    let resp = await UserModel.findOne({ where: whereObj });
+    if(!resp) {
+        return returnFormat(200, null, '原密码错误！');
+    }
+    await UserModel.update(data, {
         where: whereObj
     });
-    console.log(resp);
+    resp = objFormat({
+        ... resp.dataValues,
+        ... data
+    }, 1, 'password', 'createdAt', 'updatedAt', 'deletedAt', 'socketId', 'isOnline');
+
+    return returnFormat(200, resp, '修改成功！');
 }

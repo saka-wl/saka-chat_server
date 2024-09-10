@@ -1,6 +1,6 @@
 const express = require('express')
 const { verify } = require('../utils/session')
-const { returnFormat } = require('../utils/format')
+const { returnFormat, deleteObjNullKeys } = require('../utils/format')
 const { enroll, login, autoLogin, searchUser, changeUserInfo } = require('../service/userService')
 const router = express.Router()
 
@@ -65,8 +65,8 @@ router.post('/super/searchUser', async (req, res, next) => {
 })
 
 router.post('/super/changeUserInfo', async (req, res) => {
-    await changeUserInfo(req.body.filter(it => it));
-    res.send(returnFormat(200, true, "修改成功！"));
+    const resp = await changeUserInfo(deleteObjNullKeys(req.body));
+    res.send(resp);
 })
 
 module.exports = router
