@@ -1,6 +1,6 @@
 const express = require('express')
 const { getChatMessage, getNewChatMessageList, changeNewMsgStatus } = require('../service/friendChatService')
-const { returnFormat } = require('../utils/format')
+const { returnFormat, objFormat } = require('../utils/format')
 const router = express.Router()
 
 router.post('/super/getFriendHistoryMsg', async (req, res) => {
@@ -8,8 +8,15 @@ router.post('/super/getFriendHistoryMsg', async (req, res) => {
         chatRoomId: req.body.chatRoomId,
         // status: req.body.status || 1
     }
-    const resp = await getChatMessage(obj)
-    res.send(returnFormat(200, resp, ''))
+    const tmp = await getChatMessage(obj);
+    // 消息类型
+    const targetStatus = req.body.status || ['0', '1', '2'];
+    const result = [];
+    tmp.forEach((it) => {
+        if(targetStatus.includes(it.status))
+            result.push(objFormat(it, 1, 'updatedAt', 'deletedAt'));
+    })
+    res.send(returnFormat(200, result, ''));
 })
 
 /**

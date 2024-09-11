@@ -46,13 +46,15 @@ exports.userFriendWithDrawMsg = async (socket, usersMap, data) => {
     if(!data.id) return;
     // 1. 修改数据库中消息状态
     data.status = -2;
-    await changeMsgStatus(data.id, data.status);
+    await changeMsgStatus(data.id, { status: data.status });
     // 2. 发送socket提醒
     const toUserId = data.toUserId;
+    if(!toUserId) return;
     const toUserSocketId = usersMap.get(~~toUserId) || usersMap.get(toUserId.toString());
+    console.log(toUserSocketId);
     if(!toUserSocketId) {
         // 对方不在线，不必socket.emit
         return;
     }
-    socket.to(toUserSocketId).emit('userFriendWithDrawMsg', data.id);
+    socket.to(toUserSocketId).emit('friendWithDrawMsg', data.id);
 }
