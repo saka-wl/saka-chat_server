@@ -68,16 +68,37 @@ exports.getNewChatMessageList = async (userId, chatRoomId) => {
     // 旧消息, 5 天前
     let historyChatMsg = await chatMessageModel.findAll({
         where: {
-            toUserId: userId,
-            createdAt: {
-                [Op.gt]: new Date(new Date() - 5 * 24 * 60 * 60 * 1000)
-            }
+            [Op.or]:
+            [
+                {
+                    toUserId: userId?.toString(),
+                    status: {
+                        [Op.or]: ['0', '1', '2']
+                    },
+                    createdAt: {
+                        [Op.gt]: new Date(new Date() - 5 * 24 * 60 * 60 * 1000)
+                    }
+                },
+                {
+                    fromUserId: userId?.toString(),
+                    status: {
+                        [Op.or]: ['0', '1', '2']
+                    },
+                    createdAt: {
+                        [Op.gt]: new Date(new Date() - 5 * 24 * 60 * 60 * 1000)
+                    }
+                }
+            ]
         }
     });
     let historyChatMsgRes = [];
     for(let item of historyChatMsg) {
-        if(historyChatMsgRes.includes(item.dataValues.fromUserId)) continue;
-        historyChatMsgRes.push(item.dataValues.fromUserId);
+        if(!historyChatMsgRes.includes(item.dataValues.fromUserId)) {
+            historyChatMsgRes.push(item.dataValues.fromUserId);
+        }
+        if(!historyChatMsgRes.includes(item.dataValues.toUserId)) {
+            historyChatMsgRes.push(item.dataValues.toUserId);
+        }  
     }
 
     return {
