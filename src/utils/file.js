@@ -19,6 +19,56 @@ async function isFileExists(path) {
     }
 }
 
+exports.createTargetFiles = async () => {
+    const files = [
+        path.resolve(__dirname, '../files/largeFiles/file'),
+        path.resolve(__dirname, '../files/largeFiles/fileStream'),
+        path.resolve(__dirname, '../files/normalFiles/Files'),
+        path.resolve(__dirname, '../files/normalFiles/Images'),
+    ]
+    try {
+        for(let item of files) {
+            const isExist = await isFileExists(item);
+            if(isExist) continue;
+            fs.mkdir(item, (err) => {});
+        }
+    }catch(err) {
+        console.log(err);
+    }
+}
+
+exports.clearTargetFiles = async () => {
+    const files = [
+        path.resolve(__dirname, '../files/largeFiles/file'),
+        path.resolve(__dirname, '../files/largeFiles/fileStream'),
+        path.resolve(__dirname, '../files/normalFiles/Files'),
+        path.resolve(__dirname, '../files/normalFiles/Images'),
+    ]
+    try {
+        for(let item of files) {
+            const isExist = await isFileExists(item);
+            if(!isExist) continue;
+            clearDir(item);
+        }
+    }catch(err) {
+        console.log(err);
+    }
+}
+
+
+const clearDir = (path) => {
+    const files = fs.readdirSync(path);
+    files.forEach(file => {
+        const filePath = `${path}/${file}`;
+        const stats = fs.statSync(filePath);
+        if (stats.isDirectory()) {
+            clearDir(filePath);
+        } else {
+            fs.unlinkSync(filePath);
+        }
+    })
+};
+
 function transformFfmpeg(sourceFile, outputStream) {
     exec(`mp4fragment ${sourceFile} ${outputStream}`);
     // ffmpeg 无法处理

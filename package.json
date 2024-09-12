@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.js",
-    "socket": "nodemon ./src/socket.js"
+    "clear": "node ./src/scripts/clearFile.js"
   },
   "keywords": [],
   "author": "",
