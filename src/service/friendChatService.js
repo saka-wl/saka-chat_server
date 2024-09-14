@@ -46,7 +46,7 @@ exports.getNewChatMessageList = async (userId, chatRoomId) => {
                 [Op.or]: 
                 [ 
                     {
-                        toUserId: userId,
+                        toUserId: userId?.toString(),
                         status: 2,
                     }, 
                     { 
@@ -72,18 +72,18 @@ exports.getNewChatMessageList = async (userId, chatRoomId) => {
             [
                 {
                     toUserId: userId?.toString(),
-                    status: {
-                        [Op.or]: ['0', '1', '2']
-                    },
+                    // status: {
+                    //     [Op.or]: ['0', '1', '2']
+                    // },
                     createdAt: {
                         [Op.gt]: new Date(new Date() - 5 * 24 * 60 * 60 * 1000)
                     }
                 },
                 {
                     fromUserId: userId?.toString(),
-                    status: {
-                        [Op.or]: ['0', '1', '2']
-                    },
+                    // status: {
+                    //     [Op.or]: ['0', '1', '2']
+                    // },
                     createdAt: {
                         [Op.gt]: new Date(new Date() - 5 * 24 * 60 * 60 * 1000)
                     }
