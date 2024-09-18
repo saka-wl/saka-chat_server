@@ -3,10 +3,8 @@ const { Op } = require("sequelize")
 const { objFormat, returnFormat, isValueNull, deleteObjNullKeys } = require("../utils/format")
 const largeFileModel = require("../model/largeFileModel")
 
-exports.getFilesByCondition = async (data, page, userId) => {
-    data = objFormat(data, 0, 'id', 'fileName', 'ownUserId', 'status');
-    // if((!data.ownUserId || data.ownUserId != userId ) && isValueNull(data.status)) data.status = 1;
-    // if(data.status) data.status = ~~data.status;
+exports.getFilesByCondition = async (data, page) => {
+    data = objFormat(data, 0, 'id', 'fileName', 'status');
     data = deleteObjNullKeys(data);
     if(data.id) {
         let resp = await largeFileModel.findAll({ where: { id: data.id, status: 1 } });
@@ -24,9 +22,21 @@ exports.getFilesByCondition = async (data, page, userId) => {
                 },
                 status: 1
             },
-            { ... data }
+            { ... data, status: 1 }
         ]
     } });
+    resp = resp.map(it => {
+        it.dataValues.pwd = "***";
+        return it.dataValues
+    });
+    return returnFormat(200, resp, '');
+}
+
+exports.getFilesFromMine = async (ownUserId, userId) => {
+    if(!ownUserId) return returnFormat(200, null, '');
+    if(userId != ownUserId) return returnFormat(200, null, '您无修改权限！');
+
+    let resp = await largeFileModel.findAll({ where: { ownUserId: ownUserId } });
     resp = resp.map(it => {
         it.dataValues.pwd = "***";
         return it.dataValues

@@ -1,10 +1,15 @@
 const express = require('express')
-const { getFilesByCondition, changeFileInfo } = require('../service/fileService');
+const { getFilesByCondition, changeFileInfo, getFilesFromMine } = require('../service/fileService');
 const { returnFormat } = require('../utils/format');
 const router = express.Router()
 
 router.post('/super/getFilesByCondition', async (req, res) => {
-    const resp = await getFilesByCondition(req.body.data, req.body.page, ~~req.userInfo.id);
+    const resp = await getFilesByCondition(req.body.data, req.body.page);
+    res.send(resp);
+})
+
+router.post('/super/getFilesFromMine', async (req, res) => {
+    const resp = await getFilesFromMine(req.body.ownUserId, ~~req.userInfo.id);
     res.send(resp);
 })
 
