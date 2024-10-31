@@ -42,6 +42,12 @@ app.use('/common/uploadLargeFile', require("./controller/uploadLargeFile"));
 app.use('/common/download', require("./controller/downloadVideo"));
 
 /**
+ * b端
+ */
+// admin user接口
+app.use("/admin/user", require("./admin-controller/adminUserController"));
+
+/**
  * 错误捕获中间件
  */
 app.use(function (err, req, res, next) {

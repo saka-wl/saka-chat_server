@@ -21,6 +21,8 @@ async function isFileExists(path) {
 
 exports.createTargetFiles = async () => {
     const files = [
+        path.resolve(__dirname, '../files/largeFiles'),
+        path.resolve(__dirname, '../files/normalFiles'),
         path.resolve(__dirname, '../files/largeFiles/file'),
         path.resolve(__dirname, '../files/largeFiles/fileStream'),
         path.resolve(__dirname, '../files/normalFiles/Files'),
@@ -30,7 +32,7 @@ exports.createTargetFiles = async () => {
         for(let item of files) {
             const isExist = await isFileExists(item);
             if(isExist) continue;
-            fs.mkdir(item, (err) => {});
+            fs.mkdir(item, (err) => { console.log(err); });
         }
     }catch(err) {
         console.log(err);
