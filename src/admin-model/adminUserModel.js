@@ -17,7 +17,7 @@ module.exports = sequelize.define("AdminUser", {
     },
     avatar: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     // 1 - 普通管理员 2 - 超级管理员
     level: {

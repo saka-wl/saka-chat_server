@@ -57,15 +57,10 @@ exports.enroll = async (account, password, nickname, phone, avatar, levelPwd = '
             account,
             password: md5Password,
             nickname,
-            email,
             avatar,
             level
         })
-        let token = encipherAdminJWT({
-            id: resp.dataValues.id,
-            account: account
-        })
-        return returnFormat(200, resp.dataValues.id, "注册成功！", token)
+        return returnFormat(200, resp.dataValues.id, "注册成功！")
     }catch(err) {
         console.log(err)
         return returnFormat(500, undefined, "服务器错误！")

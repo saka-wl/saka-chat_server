@@ -19,7 +19,6 @@ router.post('/enroll', async (req, res, next) => {
     const password = req.body.password
     const nickname = req.body.nickname
     const phone = req.body?.phone
-    const email = req.body?.email
     const avatar = req.body?.avatar
     const levelPwd = req.body?.levelPwd
     const notAllow = [null, undefined, ""]
@@ -27,7 +26,7 @@ router.post('/enroll', async (req, res, next) => {
         res.send(returnFormat(400, undefined, "账号、密码、昵称不能为空！"));
         return
     }
-    res.send(await enroll(account, password, nickname, phone, email, avatar, levelPwd));
+    res.send(await enroll(account, password, nickname, phone, avatar, levelPwd));
 })
 
 // 自动登录
@@ -39,6 +38,10 @@ router.get('/super/whoami', async (req, res, next) => {
 router.post('/super/changeUserInfo', async (req, res) => {
     const resp = await changeUserInfo(deleteObjNullKeys(req.body));
     res.send(resp);
+})
+
+router.get('/loginout', async (req, res) => {
+    res.send(returnFormat(200, true, '退出成功'));
 })
 
 module.exports = router
