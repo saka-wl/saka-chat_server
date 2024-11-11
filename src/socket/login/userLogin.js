@@ -11,9 +11,8 @@ const userModel = require("../../model/userModel")
  * @returns 
  */
 module.exports = async (socket, usersMap, data) => {
-    const res = verifyJWT(data.token)
-    const userId = data.userId
-    if (res === false || userId != res.id) {
+    const userId = data.userId;
+    if (!userId) {
         return;
     }
 

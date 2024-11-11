@@ -13,8 +13,7 @@ exports.sendMsgToFriend = async (socket, usersMap, data) => {
     const userId = data.userId
     const friendId = data.friendId
     data.status = 2;
-    const res = verifyJWT(data.token);
-    if(res === false || userId != res.id || !friendId) {
+    if(!userId || !friendId) {
         return;
     }
     const friendSocketId = usersMap.get(~~friendId) || usersMap.get(friendId.toString());

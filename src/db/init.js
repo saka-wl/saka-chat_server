@@ -6,6 +6,8 @@ require("../model/friendRequestModel")
 require("../model/chatRoomModel")
 require("../model/chatRoomGroupModel")
 require("../model/chatMessageModel")
+require("../model/userAccessTokenModel")
+require("../admin-model/adminUserModel")
 
 async function init() {
     await sequelize.sync({

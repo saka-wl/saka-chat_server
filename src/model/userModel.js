@@ -34,6 +34,12 @@ module.exports = sequelize.define("User", {
     socketId: {
         type: DataTypes.STRING,
         allowNull: true,
+    },
+    // 0 - 封禁 1 - 正常
+    status: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1
     }
 }, {
     freezeTableName: true,

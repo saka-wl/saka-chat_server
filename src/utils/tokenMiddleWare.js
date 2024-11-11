@@ -1,6 +1,8 @@
 
+const { getUserStatus } = require("../service/userService");
+const { setCookie } = require("./cookie");
 const { returnFormat } = require("./format")
-const { verifyJWT } = require("./jwt")
+const { verifyJWT, verifyShortJWT, encipherShortJWT } = require("./jwt")
 // const { pathToRegexp } = require('path-to-regexp')
 
 // const needTokenPath = [
@@ -10,29 +12,51 @@ const { verifyJWT } = require("./jwt")
 //     }
 // ]
 
-module.exports = function (req, res, next) {
+module.exports = async function (req, res, next) {
     // const paths = needTokenPath.filter(item => req.method === item.method && pathToRegexp(item.path).test(req.path))
     // if (paths.length === 0) {
     //     next()
     //     return
     // }
     if (req.path.indexOf("/super/") === -1) {
-        next()
-        return
+        next();
+        return;
     }
-    let token = req.headers['Authorization'] || req.headers['authorization']
-    if (!token) {
+    let longToken = req.cookies[process.env.JWT_TOKEN_NAME];
+    let shortToken = req.cookies[process.env.JWT_SHORT_TOKEN_NAME];
+
+    // 短token存在 & 短token没问题
+    const shortData = shortToken && verifyShortJWT(shortToken);
+    if(shortData && shortData.id && shortData.account) {
+        req.userInfo = {
+            id: shortData.id,
+            account: shortData.account
+        };
+        next();
+        return;
+    }
+
+    // 短token不存在 | 过期
+    // 判断长token
+    let longData = longToken && verifyJWT(longToken);
+    if(!longData || !longData.id || !longData.account) {
+        // 长token不存在
         res.send(returnFormat(401, undefined, "您还未登录，请前往登录！"))
         return
     }
-    const data = verifyJWT(token)
-    if (!data || !data.id || !data.account) {
-        res.send(returnFormat(401, undefined, "您还未登录，请前往登录！"))
+    const userTokenData = await getUserStatus(longData.id);
+    // console.log(userTokenData.dataValues.status);
+    if(userTokenData.dataValues.status !== 1) {
+        res.send(returnFormat(401, undefined, "您的账户已被封禁，请联系管理员！"))
         return
     }
-    req.userInfo = {
-        id: data.id,
-        account: data.account
-    }
-    next()
+    longData = {
+        id: longData?.id,
+        account: longData?.account
+    };
+    // 长token存在
+    shortToken = encipherShortJWT(longData);
+    res.cookie(process.env.JWT_SHORT_TOKEN_NAME, shortToken);
+    req.userInfo = longData;
+    next();
 }

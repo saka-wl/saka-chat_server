@@ -2,7 +2,7 @@
 const UserModel = require("../model/userModel")
 const md5 = require('md5');
 const { returnFormat, objFormat } = require("../utils/format");
-const { encipherJWT } = require("../utils/jwt");
+const { encipherJWT, encipherShortJWT } = require("../utils/jwt");
 const UserFriendModel = require("../model/userFriendModel");
 const { Op } = require("sequelize");
 
@@ -19,8 +19,12 @@ exports.login = async (account, password) => {
             id: resp.dataValues.id,
             account: resp.dataValues.account
         })
+        let shortToken = encipherShortJWT({
+            id: resp.dataValues.id,
+            account: resp.dataValues.account,
+        })
         resp.dataValues.password = "***"
-        return returnFormat(200, resp.dataValues, "登录成功！", token)
+        return [returnFormat(200, resp.dataValues, "登录成功！"), shortToken, token]
     }else{
         return returnFormat(404, undefined, "账号或密码错误！")
     }
@@ -34,7 +38,7 @@ exports.autoLogin = async (account, id) => {
         }
     })
     if(resp?.dataValues?.id) {
-        resp.dataValues.password = "***"
+        resp.dataValues.password = "***";
         return returnFormat(200, resp.dataValues, "登录成功！")
     }else{
         return returnFormat(404, undefined, "请重新登录！")
@@ -64,7 +68,11 @@ exports.enroll = async (account, password, nickname, phone, email, avatar) => {
             id: resp.dataValues.id,
             account: account
         })
-        return returnFormat(200, resp.dataValues.id, "注册成功！", token)
+        let shortToken = encipherShortJWT({
+            id: resp.dataValues.id,
+            account: resp.dataValues.account
+        })
+        return [returnFormat(200, resp.dataValues.id, "注册成功！"), shortToken, token];
     }catch(err) {
         console.log(err)
         return returnFormat(500, undefined, "服务器错误！")
@@ -146,4 +154,12 @@ exports.changeUserInfo = async (data) => {
     }, 1, 'password', 'createdAt', 'updatedAt', 'deletedAt', 'socketId', 'isOnline');
 
     return returnFormat(200, resp, '修改成功！');
+}
+
+exports.getUserStatus = async (userId) => {
+    return await UserModel.findOne({ where: { id: userId } });
+}
+
+exports.changeUserStatus = async (userId, status = 0) => {
+    return await UserModel.update({ status }, { where: { id: userId } });
 }

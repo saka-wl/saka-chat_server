@@ -1,11 +1,13 @@
 
-exports.returnFormat = (code, data = "", msg = "", authorization) => {
-    return {
+exports.returnFormat = (code, data = "", msg = "", authorization, shortAuthorization) => {
+    const res = {
         code,
         data,
-        msg,
-        authorization
-    }
+        msg
+    };
+    if(authorization) res.authorization = authorization;
+    if(shortAuthorization) res.shortAuthorization = shortAuthorization;
+    return res;
 }
 
 /**

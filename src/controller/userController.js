@@ -2,6 +2,7 @@ const express = require('express')
 const { verify } = require('../utils/session')
 const { returnFormat, deleteObjNullKeys } = require('../utils/format')
 const { enroll, login, autoLogin, searchUser, changeUserInfo } = require('../service/userService')
+const { setCookie } = require('../utils/cookie')
 const router = express.Router()
 
 router.post('/login', async (req, res, next) => {
@@ -19,7 +20,10 @@ router.post('/login', async (req, res, next) => {
         return
     }
     // 2. 查询数据库验证账号密码
-    res.send(await login(account, password));
+    const [data, shortToken, longToken] = await login(account, password);
+    res.cookie(process.env.JWT_SHORT_TOKEN_NAME, shortToken);
+    res.cookie(process.env.JWT_TOKEN_NAME, longToken);
+    res.send(data);
 })
 
 router.post('/enroll', async (req, res, next) => {
@@ -41,13 +45,16 @@ router.post('/enroll', async (req, res, next) => {
         return
     }
     // 2. 注册
-    res.send(await enroll(account, password, nickname, phone, email, avatar));
+    const [data, shortToken, longToken] = await enroll(account, password, nickname, phone, email, avatar);
+    res.cookie(process.env.JWT_SHORT_TOKEN_NAME, shortToken);
+    res.cookie(process.env.JWT_TOKEN_NAME, longToken);
+    res.send(data);
 })
 
 // 自动登录
 router.get('/super/whoami', async (req, res, next) => {
     const userInfo = req.userInfo
-    res.send(await autoLogin(userInfo.account, userInfo.id))
+    res.send(await autoLogin(userInfo.account, userInfo.id));
 })
 
 router.put('/', (req, res, next) => {
