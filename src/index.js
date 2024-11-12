@@ -41,6 +41,8 @@ app.use("/common/uploadNormalFile", require("./controller/uploadNormalFile"));
 app.use('/common/uploadLargeFile', require("./controller/uploadLargeFile"));
 app.use('/common/download', require("./controller/downloadVideo"));
 
+app.use(require('./utils/adminTokenMiddleWare'));
+
 /**
  * b端
  */

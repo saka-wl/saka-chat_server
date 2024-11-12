@@ -1,6 +1,5 @@
 
 const { getUserStatus } = require("../service/userService");
-const { setCookie } = require("./cookie");
 const { returnFormat } = require("./format")
 const { verifyJWT, verifyShortJWT, encipherShortJWT } = require("./jwt")
 // const { pathToRegexp } = require('path-to-regexp')

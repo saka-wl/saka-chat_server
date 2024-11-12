@@ -1,6 +1,7 @@
 const express = require('express')
 const { returnFormat, deleteObjNullKeys } = require('../utils/format')
 const { enroll, login, autoLogin, changeUserInfo } = require('../admin-service/adminUserService')
+const { getUserInfoByCondition, changeUserStatus } = require('../service/userService')
 const router = express.Router()
 
 router.post('/login', async (req, res, next) => {
@@ -30,14 +31,22 @@ router.post('/enroll', async (req, res, next) => {
 })
 
 // 自动登录
-router.get('/super/whoami', async (req, res, next) => {
+router.get('/adminsuper/whoami', async (req, res, next) => {
     const userInfo = req.userInfo
-    res.send(await autoLogin(userInfo.account, userInfo.id))
+    res.send(await autoLogin(userInfo.account, userInfo.id));
 })
 
-router.post('/super/changeUserInfo', async (req, res) => {
-    const resp = await changeUserInfo(deleteObjNullKeys(req.body));
-    res.send(resp);
+/**
+ * 获取用户侧用户信息
+ */
+router.post('/adminsuper/getUserInfoByCondition', async (req, res) => {
+    const resp = await getUserInfoByCondition(req.body.condition, req.body.page);
+    res.send(returnFormat(200, { list: resp.rows, total: resp.count }, ''));
+})
+
+router.get('/adminsuper/changeUserStatus', async (req, res) => {
+    await changeUserStatus(req.query.userId, req.query.status);
+    res.send(returnFormat(200, true, '修改成功'));
 })
 
 router.get('/loginout', async (req, res) => {

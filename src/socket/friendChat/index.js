@@ -50,7 +50,7 @@ exports.userFriendWithDrawMsg = async (socket, usersMap, data) => {
     const toUserId = data.toUserId;
     if(!toUserId) return;
     const toUserSocketId = usersMap.get(~~toUserId) || usersMap.get(toUserId.toString());
-    console.log(toUserSocketId);
+    // console.log(toUserSocketId);
     if(!toUserSocketId) {
         // 对方不在线，不必socket.emit
         return;

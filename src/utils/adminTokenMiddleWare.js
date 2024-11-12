@@ -8,7 +8,7 @@ module.exports = function (req, res, next) {
     //     next()
     //     return
     // }
-    if (req.path.indexOf("/admin/") === -1) {
+    if (req.path.indexOf("/adminsuper/") === -1) {
         next()
         return
     }

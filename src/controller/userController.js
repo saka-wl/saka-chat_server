@@ -21,8 +21,10 @@ router.post('/login', async (req, res, next) => {
     }
     // 2. 查询数据库验证账号密码
     const [data, shortToken, longToken] = await login(account, password);
-    res.cookie(process.env.JWT_SHORT_TOKEN_NAME, shortToken);
-    res.cookie(process.env.JWT_TOKEN_NAME, longToken);
+    if(shortToken && longToken) {
+        res.cookie(process.env.JWT_SHORT_TOKEN_NAME, shortToken);
+        res.cookie(process.env.JWT_TOKEN_NAME, longToken);
+    }
     res.send(data);
 })
 

@@ -14,6 +14,9 @@ exports.login = async (account, password) => {
             password: md5Password
         }
     })
+    if(resp?.dataValues?.status === 0) {
+        return [returnFormat(403, undefined, "账号已禁用！"), null, null]
+    }
     if(resp?.dataValues?.id) {
         let token = encipherJWT({
             id: resp.dataValues.id,
@@ -26,7 +29,7 @@ exports.login = async (account, password) => {
         resp.dataValues.password = "***"
         return [returnFormat(200, resp.dataValues, "登录成功！"), shortToken, token]
     }else{
-        return returnFormat(404, undefined, "账号或密码错误！")
+        return [returnFormat(404, undefined, "账号或密码错误！"), null, null]
     }
 }
 
@@ -85,7 +88,7 @@ exports.searchUser = async ({
     userId,
     friendId
 }) => {
-    let obj = {}
+    let obj = {};
     if(account) obj.account = account;
     if(nickname) obj.nickname = nickname;
     if(friendId) obj.id = friendId;
@@ -162,4 +165,13 @@ exports.getUserStatus = async (userId) => {
 
 exports.changeUserStatus = async (userId, status = 0) => {
     return await UserModel.update({ status }, { where: { id: userId } });
+}
+
+exports.getUserInfoByCondition = async (obj, pageObj = { page: 1, pageSize: 10 }) => {
+    obj = objFormat(obj, 0, 'id', 'account', 'nickname', 'phone', 'status');
+    return await UserModel.findAndCountAll({
+        where: obj,
+        offset: (pageObj.page - 1) * pageObj.pageSize,
+        limit: pageObj.pageSize
+    })
 }
