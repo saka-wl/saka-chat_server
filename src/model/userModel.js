@@ -40,7 +40,7 @@ module.exports = sequelize.define("User", {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1
-    }
+    },
 }, {
     freezeTableName: true,
     createdAt: true,
