@@ -18,7 +18,10 @@ router.post('/super/createNewChatGroup', async (req, res) => {
         humanNumber
     } = data;
     if(!chatRoomName || !makerUserId || !humanIds || !humanNumber) res.send(returnFormat(400, null, '传递参数错误！'));
-    if(humanNumber < 3) res.send(returnFormat(400, null, '人数不足，无法创建群聊！'));
+    if(~~humanNumber < 3) {
+        res.send(returnFormat(400, null, '人数不足，无法创建群聊！'));
+        return;
+    }
     const resp = await createChatRoomGroup({ chatRoomName, makerUserId, avatar, humanIds, humanNumber });
     res.send(resp);
 })

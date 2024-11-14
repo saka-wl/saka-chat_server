@@ -32,6 +32,7 @@ app.use("/api/c/captcha", require("./controller/captcha"));
 app.use("/api/c/friend", require("./controller/friendController"));
 app.use("/api/c/friendchat", require("./controller/friendChatController"));
 app.use("/api/c/file", require("./controller/fileController"));
+app.use("/api/c/chatgroup", require("./controller/friendChatGroupController"));
 
 
 /**

@@ -13,10 +13,10 @@ const { returnFormat } = require('../utils/format');
  */
 exports.createChatRoomGroup = async (obj) => {
   // 1. 在群聊表中创建新数据
-  const resp = await chatRoomGroupModel.create(obj);
+  const resp = await chatRoomGroupModel.create({ ...obj, humanIds: JSON.stringify(obj.humanIds) });
   // 2. 在用户表中添加该群聊id
   const data = [];
-  for(let item of humanIds) {
+  for(let item of obj.humanIds) {
     data.push({
       chatRoomGroupId: resp.dataValues.id,
       userId: item
