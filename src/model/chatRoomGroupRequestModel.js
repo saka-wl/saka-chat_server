@@ -35,6 +35,10 @@ module.exports = sequelize.define("ChatRoomGroupRequest", {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
+    },
+    chatRoomAvatar: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     freezeTableName: true,
