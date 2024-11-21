@@ -72,7 +72,7 @@ router.get('/super/getAllChatRoomGroupByUserId', async (req, res) => {
         return;
     }
     const resp = await getAllChatRoomGroupByUserId(req.query.userId);
-    res.send(returnFormat(200, resp, '获取成功！'));
+    res.send(resp);
 })
 
 module.exports = router;
