@@ -10,6 +10,7 @@ require("../model/userAccessTokenModel")
 require("../admin-model/adminUserModel")
 require("../model/chatRoomGroupIdToUserIdModel")
 require("../model/chatRoomGroupRequestModel")
+require("../model/chatGroupMessageModel")
 
 async function init() {
     await sequelize.sync({
