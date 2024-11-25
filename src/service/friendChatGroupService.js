@@ -15,6 +15,7 @@ const chatRoomGroupRequestModel = require('../model/chatRoomGroupRequestModel');
  */
 exports.createChatRoomGroup = async (obj) => {
   // 1. 在群聊表中创建新数据
+  obj.humanIds.push(obj.makerUserId?.toString());
   const resp = await chatRoomGroupModel.create({ ...obj, humanIds: JSON.stringify(obj.humanIds) });
   // 2. 在用户表中添加该群聊id
   const data = [];

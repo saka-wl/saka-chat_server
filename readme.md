@@ -6,3 +6,4 @@
 
 ## TODOLIST
 1. 用户聊天状态失活，在发送消息时，带上自己的socketId，如果失活，添加该Id到map中去 DONE
+2. socket中的安全问题

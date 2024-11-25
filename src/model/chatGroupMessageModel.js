@@ -2,7 +2,7 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../db/db')
 
-module.exports = sequelize.define("ChaGrouptMessage", {
+module.exports = sequelize.define("ChatGrouptMessage", {
     chatRoomId: {
         type: DataTypes.STRING,
         allowNull: false
@@ -14,6 +14,11 @@ module.exports = sequelize.define("ChaGrouptMessage", {
     messageInfo: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    toUserIds: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: '[]'
     },
     // string | file | pic | video
     messageType: {
