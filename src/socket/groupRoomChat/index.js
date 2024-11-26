@@ -14,8 +14,9 @@ exports.sendMsgToChatGroupRoom = async (socket, usersMap, data) => {
     const humanIds = JSON.parse(data.humanIds);
     const fromUserId = data.fromUserId;
     const toUserIds = humanIds.filter(it => ~~it !== ~~fromUserId);
+    const notReadedUserIds = humanIds.filter(it => ~~it !== ~~fromUserId);
     // 1. 
-    await chatGroupMessageModel.create({ ... data, toUserIds: JSON.stringify(toUserIds) });
+    await chatGroupMessageModel.create({ ... data, toUserIds: JSON.stringify(toUserIds), notReadedUserIds: JSON.stringify(notReadedUserIds) });
     // 2. 
     for(let item of humanIds) {
         const socketId = usersMap.get(~~item) || usersMap.get(item.toString());

@@ -25,11 +25,16 @@ module.exports = sequelize.define("ChatGrouptMessage", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    // 2 需显示消息； 1 正常消息； 0 过时消息； -1 已删除消息； -2 撤回消息
+    //  1 正常消息； -1 已删除消息； -2 撤回消息
     status: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: 1
+    },
+    notReadedUserIds: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: '[]'
     }
 }, {
     freezeTableName: true,
