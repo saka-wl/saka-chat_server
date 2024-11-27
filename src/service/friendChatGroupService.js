@@ -61,6 +61,7 @@ exports.getAllChatRoomGroupByUserId = async (userId) => {
   for (let item of allChatRoomGroupIdToUserIds) {
     allChatRoomIds.push(item.dataValues.chatRoomGroupId)
   }
+  if(allChatRoomIds.length === 0) return returnFormat(200, [], '');
   const allChatGroupRooms = await chatRoomGroupModel.findAll({
     where: {
       id: {
@@ -77,10 +78,20 @@ exports.getAllChatRoomGroupByUserId = async (userId) => {
  * @returns 
  */
 exports.sendGroupChatRequest = async (obj) => {
-  const addQuery = { ...obj };
-  addQuery.status = 0;
-  // 群聊邀请用户  ||  用户申请主动加入群聊
-  const resp = await chatRoomGroupRequestModel.create(addQuery);
+  obj.status = 0;
+  if(!obj.toUserIds) {
+    // 群聊邀请用户  ||  用户申请主动加入群聊
+    const resp = await chatRoomGroupRequestModel.create(obj);
+    return returnFormat(200, resp.dataValues, '');
+  }
+  const tmp = [];
+  for(let item of obj.toUserIds) {
+    tmp.push({
+      ... obj,
+      toUserId: ~~item
+    })
+  }
+  const resp = await chatRoomGroupRequestModel.bulkCreate(tmp);
   return returnFormat(200, resp.dataValues, '');
 }
 
