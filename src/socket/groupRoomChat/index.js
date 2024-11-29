@@ -16,15 +16,15 @@ exports.sendMsgToChatGroupRoom = async (socket, usersMap, data) => {
     const toUserIds = humanIds.filter(it => ~~it !== ~~fromUserId);
     const notReadedUserIds = humanIds.filter(it => ~~it !== ~~fromUserId);
     // 1. 
-    await chatGroupMessageModel.create({ ... data, toUserIds: JSON.stringify(toUserIds), notReadedUserIds: JSON.stringify(notReadedUserIds) });
+    const resp = await chatGroupMessageModel.create({ ... data, toUserIds: JSON.stringify(toUserIds), notReadedUserIds: JSON.stringify(notReadedUserIds) });
     // 2. 
     for(let item of humanIds) {
         const socketId = usersMap.get(~~item) || usersMap.get(item.toString());
-        socketId && socket.to(socketId).emit('getGroupMsgFromChatRoom', { ... data, toUserIds });
+        socketId && socket.to(socketId).emit('getGroupMsgFromChatRoom', { ... resp.dataValues, toUserIds });
     }
     // 3. 
     const userSocketId = usersMap.get(~~data.fromUserId) || usersMap.get(data.fromUserId?.toString());
     if(userSocketId) {
-        socket.emit('getGroupMsgFromMine', { ... data, toUserIds });
+        socket.emit('getGroupMsgFromMine', { ... resp.dataValues, toUserIds });
     }
 }

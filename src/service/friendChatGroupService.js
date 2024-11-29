@@ -91,6 +91,7 @@ exports.sendGroupChatRequest = async (obj) => {
       toUserId: ~~item
     })
   }
+  console.log(tmp);
   const resp = await chatRoomGroupRequestModel.bulkCreate(tmp);
   return returnFormat(200, resp.dataValues, '');
 }
@@ -100,6 +101,14 @@ exports.sendGroupChatRequest = async (obj) => {
  * @param {*} obj 
  */
 exports.getChatRoomGroupRequestListByCondition = async (obj) => {
+  if(obj.userId) {
+    obj = {
+      [Op.or]: [
+        { fromUserId: obj.userId },
+        { toUserId: obj.userId },
+      ]
+    }
+  }
   const resp = await chatRoomGroupRequestModel.findAll({
     where: obj
   });

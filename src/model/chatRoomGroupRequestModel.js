@@ -24,7 +24,7 @@ module.exports = sequelize.define("ChatRoomGroupRequest", {
         type: DataTypes.STRING,
         allowNull: true
     },
-    // 0 - 群聊邀请用户  1 - 用户申请主动加入群聊
+    // 0 - 由群主发起的群聊邀请   1 - 由用户发起的加群请求
     type: {
       type: DataTypes.INTEGER,
       allowNull: false,
