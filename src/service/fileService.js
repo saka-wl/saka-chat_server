@@ -81,8 +81,16 @@ async function isFileExists(path) {
     }
 }
 
+/**
+ * true - 文件正常
+ * 401 - 该文件信息在数据库中不存在
+ * 201 - 数据库文件信息矫正
+ * @param {*} id 
+ * @returns 
+ */
 exports.checkFileChunks = async (id) => {
     const resp = (await largeFileModel.findOne({ where: { id: ~~id } }))?.dataValues;
+    if(!resp) return 401;
     let fileInfo = JSON.parse(resp.fileUploadInfo);
     let { hasUploadedHash } = fileInfo;
     const allFileChunks = [... hasUploadedHash];
@@ -112,6 +120,10 @@ exports.checkFileChunks = async (id) => {
     fileInfo = JSON.stringify(fileInfo);
     const res = await largeFileModel.update({ fileUploadInfo: fileInfo }, { where: { id: ~~id } });
     if(res && res[0] !== 0) {
-        return false;
+        // 更新成功
+        return 201;
+    }else {
+        // 不存在这种情况
+        return 401;
     }
 }

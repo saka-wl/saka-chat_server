@@ -4,6 +4,7 @@ const { exec } = require("child_process");
 const {
     Worker
 } = require('worker_threads');
+const { returnFormat } = require("./format");
 
 const fileChunkPath = path.join(__dirname, "../files/largeFiles/fileStream");
 const filePath = path.join(__dirname, "../files/largeFiles/file");
@@ -104,8 +105,10 @@ exports.combineFile = async (fileChunkHashs, fileId, fileName, id) => {
         // 验证资源完整性
         const worker = new Worker(path.resolve(__dirname, '../webworker', 'filecheck.js'));
         worker.postMessage(id);
-        worker.on('message', ({ isFileExist, errorChunkHash }) => {
-
+        worker.on('message', (data) => {
+            if(data === true) resolve(returnFormat(200, target, ''));
+            else if(data === 201) resolve(returnFormat(400, null, '文件出现问题，请重新上传'));
+            else if(data === 401) resolve(returnFormat(400, null, '服务器问题，请重新上传'));
         });
         worker.on('error', (err) => {
             console.log(err);
