@@ -47,6 +47,10 @@ module.exports = sequelize.define("LargeFile", {
     videoPreview: {
         type: DataTypes.STRING(500),
         allowNull: true
+    },
+    isFileFinished: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
     }
 }, {
     freezeTableName: true,

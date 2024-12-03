@@ -1,6 +1,9 @@
 const path = require("path");
 const fs = require('fs');
 const { exec } = require("child_process");
+const {
+    Worker
+} = require('worker_threads');
 
 const fileChunkPath = path.join(__dirname, "../files/largeFiles/fileStream");
 const filePath = path.join(__dirname, "../files/largeFiles/file");
@@ -29,12 +32,12 @@ exports.createTargetFiles = async () => {
         path.resolve(__dirname, '../files/normalFiles/Images'),
     ]
     try {
-        for(let item of files) {
+        for (let item of files) {
             const isExist = await isFileExists(item);
-            if(isExist) continue;
+            if (isExist) continue;
             fs.mkdir(item, (err) => { console.log(err); });
         }
-    }catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -47,12 +50,12 @@ exports.clearTargetFiles = async () => {
         path.resolve(__dirname, '../files/normalFiles/Images'),
     ]
     try {
-        for(let item of files) {
+        for (let item of files) {
             const isExist = await isFileExists(item);
-            if(!isExist) continue;
+            if (!isExist) continue;
             clearDir(item);
         }
-    }catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -81,9 +84,9 @@ function transformFfmpeg(sourceFile, outputStream) {
  * 合并文件切片
  * @param {*} fileChunkHashs 
  */
-exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
+exports.combineFile = async (fileChunkHashs, fileId, fileName, id) => {
     const target = path.resolve(filePath, fileId + path.extname(fileName));
-    if(await isFileExists(target)) return target;
+    if (await isFileExists(target)) return target;
     async function _addChunk(chunkId) {
         const chunkPath = path.join(fileChunkPath, chunkId);
         // 获取分片信息
@@ -93,10 +96,21 @@ exports.combineFile = async (fileChunkHashs, fileId, fileName) => {
     for (const chunkId of fileChunkHashs) {
         await _addChunk(chunkId);
     }
-    if(fileName.endsWith('.mp4')) {
-        transformFfmpeg(target, path.resolve(filePath, 'ffmpeg-' +fileId + path.extname(fileName)));
+
+    if (fileName.endsWith('.mp4')) {
+        transformFfmpeg(target, path.resolve(filePath, 'ffmpeg-' + fileId + path.extname(fileName)));
     }
-    return target;
+    return new Promise(async (resolve, rej) => {
+        // 验证资源完整性
+        const worker = new Worker(path.resolve(__dirname, '../webworker', 'filecheck.js'));
+        worker.postMessage(id);
+        worker.on('message', ({ isFileExist, errorChunkHash }) => {
+
+        });
+        worker.on('error', (err) => {
+            console.log(err);
+        })
+    })
 };
 
 /**

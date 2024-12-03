@@ -84,7 +84,7 @@ exports.addFileChunk = async (data) => {
     await LargeFileModel.update(tmp, { where: { fileId: data.fileId, id: data.id } });
     if(resp.fileUploadInfo.needUploadedHash.length === 0) {
         // 返回文件合并路径
-        const fileCombinePath = await combineFile(resp.fileUploadInfo.hasUploadedHash, resp.fileId, resp.fileName);
+        const fileCombinePath = await combineFile(resp.fileUploadInfo.hasUploadedHash, resp.fileId, resp.fileName, data.id);
         return returnFormat(200, fileCombinePath, '');
     }
     return returnFormat(200, resp.fileUploadInfo.needUploadedHash, '');

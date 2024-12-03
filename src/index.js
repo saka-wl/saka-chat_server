@@ -6,6 +6,10 @@ const path = require("path");
 
 require("dotenv").config();
 require("./db/init");
+/**
+ * 测试逻辑
+ */
+require('./test/index');
 
 const app = express();
 
@@ -71,5 +75,6 @@ exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE
 /**
  * socket 挂载实时聊天
  */
-const { socketApp } = require('./socket/index')
+const { socketApp } = require('./socket/index');
+const { checkFileChunks } = require("./service/fileService");
 socketApp(server)
