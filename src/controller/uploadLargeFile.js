@@ -5,13 +5,27 @@ const multer = require("multer");
 const path = require("path");
 const { returnFormat } = require('../utils/format');
 const { createReadStream } = require('fs');
+const fs = require('fs');
+
+/**
+ * 异步查看文件是否存在
+ * @param {*} path
+ * @returns
+ */
+async function isFileExists(path) {
+    try {
+        await fs.promises.stat(path);
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 const upload = (filePath, limit = 1024 * 1024 * 1024 * 5, allowExt = null) => {
     return multer({
         storage: multer.diskStorage({
             destination: function (req, file, cb) {
                 // 存储在指定位置
-                // console.log(path.join(filePath, req.query.fileId));
                 cb(null, filePath);
             },
             filename: function (req, file, cb) {
@@ -61,7 +75,12 @@ const largeFilePath = path.resolve(__dirname, "../files/largeFiles/fileStream");
  */
 router.post(
     '/uploadFileChunk',
-    upload(largeFilePath).single("file"), 
+    (req, res, next) => {
+        upload(largeFilePath).single("file")(req, res, function(err) {
+            console.log('fileUploadError: ', err);
+        })
+        next();
+    },
     async (req, res) => {
         const resp = await addFileChunk(req.query);
         res.send(resp);
@@ -78,7 +97,7 @@ router.post(
 
 router.get(
     '/getfilechunk',
-    async (req, res) => {
+    (req, res) => {
         const chunkHash = req.query.chunkHash;
         const filePath = path.join(__dirname, '../files/largeFiles/fileStream', chunkHash);
         res.set({

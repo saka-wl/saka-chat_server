@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.js",
-    "clear": "node ./src/scripts/clearFile.js"
+    "clear": "node ./src/scripts/clearFile.js",
+    "test": "nodemon ./src/test/testIndex.js"
   },
   "keywords": [],
   "author": "",

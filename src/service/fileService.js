@@ -5,6 +5,8 @@ const largeFileModel = require("../model/largeFileModel")
 const path = require("path");
 const { readFile } = require("fs/promises");
 const sparkmd5 = require('../utils/sparkMd5');
+const fs = require('fs');
+var FileReader = require('filereader')
 
 exports.getFilesByCondition = async (data, page) => {
     data = objFormat(data, 0, 'id', 'fileName', 'status');
@@ -56,74 +58,53 @@ exports.changeFileInfo = async (data, where) => {
     await largeFileModel.update(data, { where });
 }
 
-const getFileChunkMD5Info = async (filePath) => {
-    const spark = new sparkmd5.ArrayBuffer();
-    const buffer = await readFile(filePath);
-    spark.append(buffer);
-    const hash = spark.end();
-    if (hash === filePath) {
-        return true;
-    }
-    return filePath;
+const getFileChunkMD5Info = async (filePath, checkedHash) => {
+    return new Promise((res, rej) => {
+        const spark = new sparkmd5.ArrayBuffer();
+        fs.readFile(filePath, (err, data) => {
+            const buffer = new Uint8Array(data).buffer;
+            spark.append(buffer);
+            const hash = spark.end();
+            if(hash === checkedHash) {
+                res(true);
+            }else{
+                res(checkedHash);
+            }
+        })
+    })
 }
 
 /**
- * 异步查看文件是否存在
- * @param {*} path
- * @returns
- */
-async function isFileExists(path) {
-    try {
-        await fs.promises.stat(path);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-/**
- * true - 文件正常
- * 401 - 该文件信息在数据库中不存在
- * 201 - 数据库文件信息矫正
+ * 210 - 文件校验正常
+ * 311 - 文件校验发现切片存在缺失，数据库文件信息矫正成功 携带fileInfo
+ * 411 - 该文件信息在数据库中不存在
  * @param {*} id 
  * @returns 
  */
 exports.checkFileChunks = async (id) => {
     const resp = (await largeFileModel.findOne({ where: { id: ~~id } }))?.dataValues;
-    if(!resp) return 401;
+    if (!resp) return { code: 411 };
     let fileInfo = JSON.parse(resp.fileUploadInfo);
-    let { hasUploadedHash } = fileInfo;
-    const allFileChunks = [... hasUploadedHash];
-    const { fileName } = resp;
-    const filePath = path.resolve(__dirname, '../', 'files', 'largeFiles', 'file', fileInfo.fileId + path.extname(fileName));
+    const { hasUploadedHash, needUploadedHash } = fileInfo;
+    let hasUploadedHashChecked = [...hasUploadedHash];
+    let needUploadedHashChecked = [...needUploadedHash];
     const fileChunkPath = path.resolve(__dirname, '../', 'files', 'largeFiles', 'fileStream');
-    // 整体文件是否存在
-    const isFileExist = await isFileExists(filePath);
-    const needUploadedHash = [];
-    for(const hashChunk of allFileChunks) {
+    for (const hashChunk of hasUploadedHash) {
         const chunkPath = path.resolve(fileChunkPath, hashChunk);
-        const isChunkExist = await isFileExists(chunkPath);
-        if(!isChunkExist) {
-            needUploadedHash.push(hashChunk);
-            hasUploadedHash = hasUploadedHash.filter(it => it !== hashChunk);
+        if (!fs.existsSync(chunkPath)) {
+            needUploadedHashChecked.push(hashChunk);
+            hasUploadedHashChecked = hasUploadedHashChecked.filter(it => it !== hashChunk);
             continue;
         }
-        const res = await getFileChunkMD5Info(chunkPath);
-        if(res !== true) {
-            needUploadedHash.push(res);
-            hasUploadedHash = hasUploadedHash.filter(it => it !== res);
+        const res = await getFileChunkMD5Info(chunkPath, hashChunk);
+        if (res !== true) {
+            needUploadedHashChecked.push(res);
+            hasUploadedHashChecked = hasUploadedHashChecked.filter(it => it !== res);
         }
     }
-    if(needUploadedHash.length === 0) return true;
-    fileInfo.needUploadedHash = needUploadedHash;
-    fileInfo.hasUploadedHash = hasUploadedHash;
-    fileInfo = JSON.stringify(fileInfo);
-    const res = await largeFileModel.update({ fileUploadInfo: fileInfo }, { where: { id: ~~id } });
-    if(res && res[0] !== 0) {
-        // 更新成功
-        return 201;
-    }else {
-        // 不存在这种情况
-        return 401;
-    }
+    if (needUploadedHashChecked.join('') === needUploadedHash.join('')) return { code: 210 };
+    fileInfo.needUploadedHash = needUploadedHashChecked;
+    fileInfo.hasUploadedHash = hasUploadedHashChecked;
+    await largeFileModel.update({ fileUploadInfo: JSON.stringify(fileInfo) }, { where: { id: ~~id, fileId: fileInfo.fileId } });
+    return { code: 311, fileInfo };
 }

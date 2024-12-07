@@ -1,15 +1,17 @@
 
 const { objFormat, returnFormat, isValueNull } = require("../utils/format");
 const LargeFileModel = require("../model/largeFileModel");
-const { combineFile } = require("../utils/file");
+const { combineFile, totalFileCheck } = require("../utils/file");
 
 /**
- * 
+ * 简介：点击上传之后调用的函数，会在数据库中新创建一个 文件记录
+ * 1. 找到该fileId的文件的上传的最新状态
+ * 2. 进行文件校验
  * @param {*} data fileId fileName ownUserId fileUploadInfo 必传
  * @returns 
  */
 exports.editNewFileInfo = async (data) => {
-    data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo', 'videoPreview');
+    data = objFormat(data, 0, 'fileId', 'pwd', 'fileName', 'ownUserId', 'fileUploadInfo', 'videoPreview', 'isNeedCheck');
     data.fileType = 2;
     if (data.fileName.endsWith('.mp4')) data.fileType = 4;
     data.pwd = !isValueNull(data.pwd) ? data.pwd : null;
@@ -18,6 +20,7 @@ exports.editNewFileInfo = async (data) => {
     }
     const hasUploadedSamedFiles = await LargeFileModel.findAll({ where: { fileId: data.fileId } });
     let targetTmpFile = null;
+    // 下面的for循环判断是否有用户创建过相同的文件，如果有，对比得到哪个文件的上传进度最大，然后直接复用这个文件的上传进度以及文件切片
     for(let item of hasUploadedSamedFiles) {
         item = item.dataValues;
         if(!targetTmpFile) {
@@ -53,14 +56,45 @@ exports.editNewFileInfo = async (data) => {
         curUserFile = await LargeFileModel.create({ ... data, fileUploadInfo: targetTmpFile.fileUploadInfo });
         curUserFile = curUserFile.dataValues;
     }
-    return returnFormat(
-        200,
-        {
-            id: curUserFile.id,
-            needUploadedHash: JSON.parse(targetTmpFile.fileUploadInfo).needUploadedHash,
-        },
-        ''
-    );
+    if(data.isNeedCheck !== true) {
+        // 不需要校验
+        return returnFormat(
+            200,
+            {
+                id: curUserFile.id,
+                needUploadedHash: JSON.parse(targetTmpFile.fileUploadInfo).needUploadedHash,
+            },
+            ''
+        );
+    }
+
+    // 需要校验文件
+    // 对于点击了开始上传，第一次上传的切片，我们需要检测文件上传的完整性（验证数据库中的数据与文件切片中的数据是否一致）
+    const resp = await totalFileCheck(curUserFile.id);
+    if(resp === true) {
+        // 文件校验没问题
+        return returnFormat(
+            200,
+            {
+                id: curUserFile.id,
+                needUploadedHash: JSON.parse(targetTmpFile.fileUploadInfo).needUploadedHash,
+            },
+            ''
+        );
+    }
+    const { code, fileInfo, msg } = resp;
+    if(fileInfo && fileInfo.needUploadedHash) {
+        // 文件校验出现问题，返回最新的数据
+        return returnFormat(
+            200,
+            {
+                id: curUserFile.id,
+                needUploadedHash: fileInfo.needUploadedHash,
+            },
+            ''
+        );
+    }
+    return returnFormat(code, fileInfo, msg);
 }
 
 /**
@@ -84,8 +118,8 @@ exports.addFileChunk = async (data) => {
     await LargeFileModel.update(tmp, { where: { fileId: data.fileId, id: data.id } });
     if(resp.fileUploadInfo.needUploadedHash.length === 0) {
         // 返回文件合并路径
-        const resp = await combineFile(resp.fileUploadInfo.hasUploadedHash, resp.fileId, resp.fileName, data.id);
-        return resp;
+        const { code, fileInfo, msg } = await combineFile(resp.fileUploadInfo.hasUploadedHash, resp.fileId, resp.fileName, data.id);
+        return returnFormat(code, fileInfo, msg);
     }
     return returnFormat(200, resp.fileUploadInfo.needUploadedHash, '');
 }

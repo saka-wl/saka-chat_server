@@ -76,5 +76,5 @@ exports.globalSessionInfo = new NodeCache({ stdTTL: process.env.CAPTCHA_TIMELINE
  * socket 挂载实时聊天
  */
 const { socketApp } = require('./socket/index');
-const { checkFileChunks } = require("./service/fileService");
+// const { checkFileChunks } = require("./service/fileService");
 socketApp(server)

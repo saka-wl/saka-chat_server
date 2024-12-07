@@ -82,12 +82,39 @@ function transformFfmpeg(sourceFile, outputStream) {
 }
 
 /**
+ * 验证资源完整性
+ * @param {*} id 
+ * @returns 
+ */
+exports.totalFileCheck = (id) => {
+    return new Promise(async (resolve, rej) => {
+        const worker = new Worker(path.resolve(__dirname, '../webworker', 'filecheck.js'));
+        worker.postMessage(id);
+        worker.on('message', ({ code, fileInfo = null }) => {
+            if (code === 210) resolve(true);
+            else if (code === 311) resolve({ code: 400, fileInfo, msg: '文件出现问题，请重新上传' });
+            else if (code === 411) resolve({ code: 400, fileInfo, msg: '服务器问题，请重新上传' });
+        });
+        worker.on('error', (err) => {
+            console.log(err);
+            resolve({ code: 400, fileInfo: null, msg: '服务器问题，请重新上传' });
+        })
+    });
+}
+
+/**
  * 合并文件切片
+ * 1. 校验所有的文件切片
+ * 2. 文件合并
  * @param {*} fileChunkHashs 
  */
 exports.combineFile = async (fileChunkHashs, fileId, fileName, id) => {
+    // 验证资源完整性
+    const fileCheckResp = await exports.totalFileCheck(id);
+    if (fileCheckResp !== true) return fileCheckResp;
+    // 文件合并
     const target = path.resolve(filePath, fileId + path.extname(fileName));
-    if (await isFileExists(target)) return target;
+    if (await isFileExists(target)) return { code: 200, fileInfo: target, msg: '文件合并成功！' };
     async function _addChunk(chunkId) {
         const chunkPath = path.join(fileChunkPath, chunkId);
         // 获取分片信息
@@ -101,19 +128,7 @@ exports.combineFile = async (fileChunkHashs, fileId, fileName, id) => {
     if (fileName.endsWith('.mp4')) {
         transformFfmpeg(target, path.resolve(filePath, 'ffmpeg-' + fileId + path.extname(fileName)));
     }
-    return new Promise(async (resolve, rej) => {
-        // 验证资源完整性
-        const worker = new Worker(path.resolve(__dirname, '../webworker', 'filecheck.js'));
-        worker.postMessage(id);
-        worker.on('message', (data) => {
-            if(data === true) resolve(returnFormat(200, target, ''));
-            else if(data === 201) resolve(returnFormat(400, null, '文件出现问题，请重新上传'));
-            else if(data === 401) resolve(returnFormat(400, null, '服务器问题，请重新上传'));
-        });
-        worker.on('error', (err) => {
-            console.log(err);
-        })
-    })
+    return { code: 200, fileInfo: target, msg: '文件合并成功！' };
 };
 
 /**
