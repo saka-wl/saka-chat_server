@@ -3,10 +3,8 @@ const { Op } = require("sequelize")
 const { objFormat, returnFormat, isValueNull, deleteObjNullKeys } = require("../utils/format")
 const largeFileModel = require("../model/largeFileModel")
 const path = require("path");
-const { readFile } = require("fs/promises");
 const sparkmd5 = require('../utils/sparkMd5');
 const fs = require('fs');
-var FileReader = require('filereader')
 
 exports.getFilesByCondition = async (data, page) => {
     data = objFormat(data, 0, 'id', 'fileName', 'status');
