@@ -54,6 +54,7 @@ app.use(require('./utils/adminTokenMiddleWare'));
  */
 // admin user接口
 app.use("/admin/user", require("./admin-controller/adminUserController"));
+app.use("/admin/file", require("./admin-controller/adminFileController"));
 
 /**
  * 错误捕获中间件

@@ -19,7 +19,7 @@ module.exports = sequelize.define("LargeFile", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    // 1 正常； 0 隐藏； -1 删除
+    // 1 正常； 0 隐藏； -1 删除；2 被管理员封禁
     status: {
         type: DataTypes.INTEGER,
         allowNull: false,
