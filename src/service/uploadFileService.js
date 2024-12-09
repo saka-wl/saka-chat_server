@@ -50,10 +50,10 @@ exports.editNewFileInfo = async (data) => {
     let curUserFile = await LargeFileModel.findAll({ where: { fileId: data.fileId, fileName: data.fileName, ownUserId: data.ownUserId } });
     if(curUserFile && curUserFile.length > 0) {
         // 该用户创建过名字一样的文件
-        await LargeFileModel.update({ fileUploadInfo: targetTmpFile.fileUploadInfo }, { where: { fileId: data.fileId, fileName: data.fileName, ownUserId: data.ownUserId } });
+        await LargeFileModel.update({ fileUploadInfo: targetTmpFile.fileUploadInfo, status: 1 }, { where: { fileId: data.fileId, fileName: data.fileName, ownUserId: data.ownUserId } });
         curUserFile = curUserFile[0].dataValues;
     }else{
-        curUserFile = await LargeFileModel.create({ ... data, fileUploadInfo: targetTmpFile.fileUploadInfo });
+        curUserFile = await LargeFileModel.create({ ... data, fileUploadInfo: targetTmpFile.fileUploadInfo, status: 1 });
         curUserFile = curUserFile.dataValues;
     }
     if(data.isNeedCheck !== true) {
