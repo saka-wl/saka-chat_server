@@ -41,7 +41,7 @@ exports.getFilesFromMine = async (ownUserId, userId) => {
     if (!ownUserId) return returnFormat(200, null, '');
     if (userId != ownUserId) return returnFormat(200, null, '您无修改权限！');
 
-    let resp = await largeFileModel.findAll({ where: { ownUserId: ownUserId } });
+    let resp = await largeFileModel.findAll({ where: { ownUserId: ownUserId, status: { [Op.or]: [-1, 0, 1] } } });
     resp = resp.map(it => {
         it.dataValues.pwd = "***";
         return it.dataValues
