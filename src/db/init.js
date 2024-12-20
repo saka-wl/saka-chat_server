@@ -11,6 +11,8 @@ require("../admin-model/adminUserModel")
 require("../model/chatRoomGroupIdToUserIdModel")
 require("../model/chatRoomGroupRequestModel")
 require("../model/chatGroupMessageModel")
+require("../model/mdFileModel");
+require("../model/userToMdFileModel");
 
 async function init() {
     await sequelize.sync({

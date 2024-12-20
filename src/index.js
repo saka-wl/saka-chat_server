@@ -39,6 +39,8 @@ app.use("/api/c/file", require("./controller/fileController"));
 app.use("/api/c/chatgroup", require("./controller/friendChatGroupController"));
 app.use('/api/c/chatgroupmessage', require('./controller/friendChatGroupMessageController'));
 
+// md文件编辑
+app.use('/api/c/markdown', require('./controller/mdFileController'));
 
 /**
  * 工具api
